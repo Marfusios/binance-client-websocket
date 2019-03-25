@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Binance.Client.Websocket</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Mariusz Kotas</Authors>
+    <Description>Client for Binance websocket API</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <Copyright>Copyright 2019 Mariusz Kotas. All rights reserved.</Copyright>
+    <PackageTags>Binance websockets websocket client cryptocurrency exchange bitcosin</PackageTags>
+    <PackageLicenseUrl>https://github.com/Marfusios/binance-client-websocket/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Marfusios/binance-client-websocket</PackageProjectUrl>
+    <PackageIconUrl>https://www.binance.com/resources/img/activity/LOGO1.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Marfusios/binance-client-websocket</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile> 
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibLog" Version="5.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="System.Reactive" Version="4.0.0" />
+    <PackageReference Include="Websocket.Client" Version="3.0.17" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Responses\Instruments\" />
+  </ItemGroup>
+</Project>
