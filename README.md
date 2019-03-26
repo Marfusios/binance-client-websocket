@@ -1,4 +1,4 @@
-![Logo](binance-logo-alt.png)
+﻿![Logo](binance-logo-alt.png)
 # Binance websocket API client [![Build Status](https://travis-ci.org/Marfusios/binance-client-websocket.svg?branch=master)](https://travis-ci.org/Marfusios/binance-client-websocket) [![NuGet version](https://badge.fury.io/nu/Binance.Client.Websocket.svg)](https://badge.fury.io/nu/Binance.Client.Websocket)
 
 This is a C# implementation of the Binance websocket API found here:
@@ -22,24 +22,23 @@ https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-so
 
 ```csharp
 var exitEvent = new ManualResetEvent(false);
-var url = Binance.ApiWebsocketUrl;
+var url = BinanceValues.ApiWebsocketUrl;
 
 using (var communicator = new BinanceWebsocketCommunicator(url))
 {
     using (var client = new BinanceWebsocketClient(communicator))
     {
-        client.Streams.InfoStream.Subscribe(info =>
+        client.Streams.TradesStream.Subscribe(response =>
         {
-            Console.WriteLine($"Info received, reconnection happened.")
-            client.Send(new PingRequest()).Wait();
+            var trade = response.Data;
+            Console.WriteLine($"Trade executed [{trade.Symbol}] price: {trade.Price}");
         });
 
-        client.Streams.PongStream.Subscribe(pong =>
-        {
-            Console.WriteLine($"Pong received!")
-            exitEvent.Set();
-        });
-
+        client.SetSubscriptions(
+            new TradeSubscription("btcusdt"),
+            new TradeSubscription("ethbtc"),
+            new TradeSubscription("bnbbtc"),
+            );
         await communicator.Start();
 
         exitEvent.WaitOne(TimeSpan.FromSeconds(30));
@@ -56,8 +55,8 @@ More usage examples:
 
 | PUBLIC                 |    Covered     |  
 |------------------------|:--------------:|
-| Aggregate trades       |                |
-| Trades                 |                |
+| Aggregate trades       |  ✔            |
+| Trades                 |  ✔            |
 | Kline/Candlesticks     |                |
 | Individual mini tickers|                |
 | All mini tickers       |                |
