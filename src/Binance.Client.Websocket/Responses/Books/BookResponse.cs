@@ -1,15 +1,11 @@
 ﻿using System.Reactive.Subjects;
 using Binance.Client.Websocket.Json;
-using Binance.Client.Websocket.Messages;
 using Newtonsoft.Json.Linq;
 
 namespace Binance.Client.Websocket.Responses.Books
 {
-    public class BookResponse : ResponseBase
+    public class BookResponse : ResponseBase<BookLevel>
     {
-        public override MessageType Op => MessageType.OrderBook;
-
-        public BookLevel[] Data { get; set; }
 
         internal static bool TryHandle(JObject response, ISubject<BookResponse> subject)
         {

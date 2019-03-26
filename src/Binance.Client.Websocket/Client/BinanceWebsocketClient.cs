@@ -1,20 +1,15 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Binance.Client.Websocket.Communicator;
+using Binance.Client.Websocket.Exceptions;
 using Binance.Client.Websocket.Json;
 using Binance.Client.Websocket.Logging;
-using Binance.Client.Websocket.Requests;
 using Binance.Client.Websocket.Responses;
 using Binance.Client.Websocket.Responses.Books;
-using Binance.Client.Websocket.Responses.Instruments;
-using Binance.Client.Websocket.Responses.Liquidation;
-using Binance.Client.Websocket.Responses.Margins;
-using Binance.Client.Websocket.Responses.Orders;
-using Binance.Client.Websocket.Responses.Positions;
-using Binance.Client.Websocket.Responses.Quotes;
 using Binance.Client.Websocket.Responses.TradeBins;
 using Binance.Client.Websocket.Responses.Trades;
-using Binance.Client.Websocket.Responses.Wallets;
+using Binance.Client.Websocket.Subscriptions;
 using Binance.Client.Websocket.Validations;
 using Newtonsoft.Json.Linq;
 using Websocket.Client;
@@ -22,8 +17,8 @@ using Websocket.Client;
 namespace Binance.Client.Websocket.Client
 {
     /// <summary>
-    /// Bitmex websocket client.
-    /// Use method `Send()` to subscribe to channels.
+    /// Binance websocket client.
+    /// Use method `Connect()` to start client and subscribe to channels.
     /// And `Streams` to subscribe. 
     /// </summary>
     public class BinanceWebsocketClient : IDisposable
@@ -56,19 +51,53 @@ namespace Binance.Client.Websocket.Client
         }
 
         /// <summary>
+        /// Combine url with subscribed streams
+        /// </summary>
+        public Uri PrepareSubscriptions(Uri baseUrl, params SubscriptionBase[] subscriptions)
+        {
+            BnbValidations.ValidateInput(baseUrl, nameof(baseUrl));
+
+            if(subscriptions == null || !subscriptions.Any())
+                throw new BinanceBadInputException("Please provide at least one subscription");
+
+            var streams = subscriptions.Select(x => x.StreamName).ToArray();
+            var urlPart = string.Join("/", streams);
+            var urlPartFull = $"/stream?streams={urlPart}";
+
+            var currentUrl = baseUrl.ToString().Trim();
+
+            if (currentUrl.Contains("stream?"))
+            {
+                // do nothing, already configured
+                return baseUrl;
+            }
+
+            var newUrl = new Uri($"{currentUrl.TrimEnd('/')}{urlPartFull}");
+            return newUrl;
+        }
+
+        /// <summary>
+        /// Combine url with subscribed streams and set it into communicator.
+        /// Then you need to call communicator.Start() or communicator.Reconnect()
+        /// </summary>
+        public void SetSubscriptions(params SubscriptionBase[] subscriptions)
+        {
+            var newUrl = PrepareSubscriptions(_communicator.Url, subscriptions);
+            _communicator.Url = newUrl;
+        }
+
+        /// <summary>
         /// Serializes request and sends message via websocket communicator. 
         /// It logs and re-throws every exception. 
         /// </summary>
         /// <param name="request">Request/message to be sent</param>
-        public async Task Send<T>(T request) where T: RequestBase
+        public async Task Send<T>(T request)
         {
             try
             {
                 BnbValidations.ValidateInput(request, nameof(request));
 
-                var serialized = request.IsRaw ? 
-                    request.OperationString :
-                    BinanceJsonSerializer.Serialize(request);
+                var serialized = BinanceJsonSerializer.Serialize(request);
                 await _communicator.Send(serialized).ConfigureAwait(false);
             }
             catch (Exception e)
@@ -78,19 +107,9 @@ namespace Binance.Client.Websocket.Client
             }
         }
 
-        /// <summary>
-        /// Sends authentication request via websocket communicator
-        /// </summary>
-        /// <param name="apiKey">Your API key</param>
-        /// <param name="apiSecret">Your API secret</param>
-        public Task Authenticate(string apiKey, string apiSecret)
-        {
-            return Send(new AuthenticationRequest(apiKey, apiSecret));
-        }
-
         private string L(string msg)
         {
-            return $"[BMX WEBSOCKET CLIENT] {msg}";
+            return $"[BNB WEBSOCKET CLIENT] {msg}";
         }
 
         private void HandleMessage(ResponseMessage message)
@@ -140,21 +159,8 @@ namespace Binance.Client.Websocket.Client
             return
 
                 TradeResponse.TryHandle(response, Streams.TradesSubject) ||
-                TradeBinResponse.TryHandle(response, Streams.TradeBinSubject) ||
-                BookResponse.TryHandle(response, Streams.BookSubject) ||
-                QuoteResponse.TryHandle(response, Streams.QuoteSubject) ||
-                LiquidationResponse.TryHandle(response, Streams.LiquidationSubject) ||
-                PositionResponse.TryHandle(response, Streams.PositionSubject) ||
-                MarginResponse.TryHandle(response, Streams.MarginSubject) ||
-                OrderResponse.TryHandle(response, Streams.OrderSubject) ||
-                WalletResponse.TryHandle(response, Streams.WalletSubject) ||
-                InstrumentResponse.TryHandle(response, Streams.InstrumentSubject) ||
-
-
-                ErrorResponse.TryHandle(response, Streams.ErrorSubject) ||
-                SubscribeResponse.TryHandle(response, Streams.SubscribeSubject) ||
-                InfoResponse.TryHandle(response, Streams.InfoSubject) ||
-                AuthenticationResponse.TryHandle(response, Streams.AuthenticationSubject);
+                AggregatedTradeResponse.TryHandle(response, Streams.TradeBinSubject) ||
+                BookResponse.TryHandle(response, Streams.BookSubject);
         }
     }
 }

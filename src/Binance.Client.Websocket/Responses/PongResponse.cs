@@ -1,12 +1,15 @@
 ﻿using System.Reactive.Subjects;
-using Binance.Client.Websocket.Messages;
 
 namespace Binance.Client.Websocket.Responses
 {
+    /// <summary>
+    /// Pong response
+    /// </summary>
     public class PongResponse : MessageBase
     {
-        public override MessageType Op => MessageType.Ping;
-
+        /// <summary>
+        /// Received pong message
+        /// </summary>
         public string Message { get; set; }
 
         internal static bool TryHandle(string response, ISubject<PongResponse> subject)

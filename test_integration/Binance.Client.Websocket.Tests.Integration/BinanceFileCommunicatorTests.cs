@@ -37,7 +37,7 @@ namespace Binance.Client.Websocket.Tests.Integration
             var client = new BinanceWebsocketClient(communicator);
             client.Streams.TradesStream.Subscribe(response =>
             {
-                trades.AddRange(response.Data);
+                trades.Add(response.Data);
             });
 
             await communicator.Start();

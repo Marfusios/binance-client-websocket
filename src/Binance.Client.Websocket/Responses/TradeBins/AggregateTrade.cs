@@ -2,12 +2,12 @@
 using Binance.Client.Websocket.Json;
 using Newtonsoft.Json;
 
-namespace Binance.Client.Websocket.Responses.Trades
+namespace Binance.Client.Websocket.Responses.TradeBins
 {
     /// <summary>
-    /// Info about executed trade
+    /// Aggregated info about executed trades
     /// </summary>
-    public class Trade : MessageBase
+    public class AggregateTrade : MessageBase
     {
         /// <summary>
         /// The symbol the trade was for
@@ -18,8 +18,8 @@ namespace Binance.Client.Websocket.Responses.Trades
         /// <summary>
         /// The id of this aggregated trade
         /// </summary>
-        [JsonProperty("t")]
-        public long TradeId { get; set; }
+        [JsonProperty("a")]
+        public long AggregatedTradeId { get; set; }
 
         /// <summary>
         /// The price of the trades
@@ -36,14 +36,14 @@ namespace Binance.Client.Websocket.Responses.Trades
         /// <summary>
         /// The first trade id in this aggregation
         /// </summary>
-        [JsonProperty("b")]
-        public long BuyerOrderId { get; set; }
+        [JsonProperty("f")]
+        public long FirstTradeId { get; set; }
 
         /// <summary>
         /// The last trade id in this aggregation
         /// </summary>
-        [JsonProperty("a")]
-        public long SellerOrderId { get; set; }
+        [JsonProperty("l")]
+        public long LastTradeId { get; set; }
 
         /// <summary>
         /// The time of the trades

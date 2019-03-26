@@ -1,6 +1,5 @@
 ﻿using System.Reactive.Subjects;
 using Binance.Client.Websocket.Json;
-using Binance.Client.Websocket.Messages;
 using Newtonsoft.Json.Linq;
 
 namespace Binance.Client.Websocket.Responses.Trades
@@ -8,22 +7,15 @@ namespace Binance.Client.Websocket.Responses.Trades
     /// <summary>
     /// Trades response
     /// </summary>
-    public class TradeResponse : ResponseBase
+    public class TradeResponse : ResponseBase<Trade>
     {
-        /// <summary>
-        /// Operation type
-        /// </summary>
-        public override MessageType Op => MessageType.Trade;
 
-        /// <summary>
-        /// All latest trades
-        /// </summary>
-        public Trade[] Data { get; set; }
 
 
         internal static bool TryHandle(JObject response, ISubject<TradeResponse> subject)
         {
-            if (response?["table"]?.Value<string>() != "trade")
+            var stream = response?["stream"]?.Value<string>();
+            if (stream == null || !stream.ToLower().EndsWith("@trade"))
                 return false;
 
             var parsed = response.ToObject<TradeResponse>(BinanceJsonSerializer.Serializer);

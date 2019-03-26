@@ -15,8 +15,6 @@
         /// </summary>
         public string Symbol { get; set; }
 
-        public BitmexSide Side { get; set; }
-
         /// <summary>
         /// Available only for 'partial', 'insert' and 'update' action
         /// </summary>

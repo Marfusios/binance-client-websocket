@@ -27,6 +27,7 @@ namespace Binance.Client.Websocket.Files
         public string[] FileNames { get; set; }
         public string Delimiter { get; set; }
         public Encoding Encoding { get; set; } = Encoding.UTF8;
+        public Uri Url { get; set; }
 
         public virtual void Dispose()
         {

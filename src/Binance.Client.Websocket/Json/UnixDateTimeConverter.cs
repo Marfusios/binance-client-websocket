@@ -6,18 +6,27 @@ using Newtonsoft.Json.Converters;
 
 namespace Binance.Client.Websocket.Json
 {
+    /// <summary>
+    /// Converter between unix date time (milliseconds as long type) and DateTime
+    /// </summary>
     public class UnixDateTimeConverter : DateTimeConverterBase
     {
+        /// <summary>
+        /// Serialize DateTime into Unix milliseconds
+        /// </summary>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var subtracted = ((DateTime)value).Subtract(BitmexTime.UnixBase);
+            var subtracted = ((DateTime)value).Subtract(BinanceTime.UnixBase);
             writer.WriteRawValue(subtracted.TotalMilliseconds.ToString(CultureInfo.InvariantCulture));
         }
 
+        /// <summary>
+        /// Deserialize Unix milliseconds into DateTime
+        /// </summary>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (reader.Value == null) { return null; }
-            return BitmexTime.ConvertToTime((long)reader.Value);
+            return BinanceTime.ConvertToTime((long)reader.Value);
         }
     }
 }

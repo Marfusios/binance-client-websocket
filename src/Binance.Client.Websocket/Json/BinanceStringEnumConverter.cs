@@ -5,10 +5,16 @@ using Newtonsoft.Json.Converters;
 
 namespace Binance.Client.Websocket.Json
 {
+    /// <summary>
+    /// Enum converter - convert enum as string
+    /// </summary>
     public class BinanceStringEnumConverter : StringEnumConverter
     {
         private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
 
+        /// <summary>
+        /// Read JSON string and convert to enum
+        /// </summary>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             try
