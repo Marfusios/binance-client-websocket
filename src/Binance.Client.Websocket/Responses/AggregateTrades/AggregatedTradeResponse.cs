@@ -2,7 +2,7 @@
 using Binance.Client.Websocket.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Binance.Client.Websocket.Responses.TradeBins
+namespace Binance.Client.Websocket.Responses.AggregateTrades
 {
     /// <summary>
     /// Trades bin response, contains all trades executed in a selected time range

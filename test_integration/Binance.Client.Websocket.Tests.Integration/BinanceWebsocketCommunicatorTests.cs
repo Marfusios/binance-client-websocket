@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Binance.Client.Websocket.Subscriptions;
 using Binance.Client.Websocket.Websockets;
 using Xunit;
 
@@ -20,6 +21,8 @@ namespace Binance.Client.Websocket.Tests.Integration
                 {
                     receivedEvent.Set();
                 });
+
+                communicator.Url = new Uri(url + "stream?streams=btcusdt@trade");
 
                 await communicator.Start();
 

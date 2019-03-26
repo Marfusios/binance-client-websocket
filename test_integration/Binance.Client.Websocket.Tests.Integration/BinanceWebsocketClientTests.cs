@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Binance.Client.Websocket.Client;
 using Binance.Client.Websocket.Responses.Trades;
+using Binance.Client.Websocket.Subscriptions;
 using Binance.Client.Websocket.Websockets;
 using Xunit;
 
@@ -27,6 +28,10 @@ namespace Binance.Client.Websocket.Tests.Integration
                         received = response;
                         receivedEvent.Set();
                     });
+
+                    client.SetSubscriptions(
+                        new TradeSubscription("btcusdt")
+                        );
 
                     await communicator.Start();
 

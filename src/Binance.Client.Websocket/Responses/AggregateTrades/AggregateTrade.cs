@@ -1,8 +1,9 @@
 ﻿using System;
 using Binance.Client.Websocket.Json;
+using Binance.Client.Websocket.Responses.Trades;
 using Newtonsoft.Json;
 
-namespace Binance.Client.Websocket.Responses.TradeBins
+namespace Binance.Client.Websocket.Responses.AggregateTrades
 {
     /// <summary>
     /// Aggregated info about executed trades
@@ -62,5 +63,11 @@ namespace Binance.Client.Websocket.Responses.TradeBins
         /// </summary>
         [JsonProperty("M")]
         public bool IsMatch { get; set; }
+
+        /// <summary>
+        /// Side of the trade
+        /// </summary>
+        [JsonIgnore]
+        public TradeSide Side => IsBuyerMaker ? TradeSide.Sell : TradeSide.Buy;
     }
 }

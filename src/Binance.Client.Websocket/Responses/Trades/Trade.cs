@@ -62,5 +62,11 @@ namespace Binance.Client.Websocket.Responses.Trades
         /// </summary>
         [JsonProperty("M")]
         public bool IsMatch { get; set; }
+
+        /// <summary>
+        /// Side of the trade
+        /// </summary>
+        [JsonIgnore]
+        public TradeSide Side => IsBuyerMaker ? TradeSide.Sell : TradeSide.Buy;
     }
 }

@@ -75,14 +75,14 @@ namespace Binance.Client.Websocket.Sample
             client.Streams.AggregateTradesStream.Subscribe(response =>
             {
                 var trade = response.Data;
-                Log.Information($"Trade aggreg [{trade.Symbol}] [{(trade.IsBuyerMaker ? "SELL" : "BUY")}] " +
+                Log.Information($"Trade aggreg [{trade.Symbol}] [{trade.Side}] " +
                                 $"price: {trade.Price} size: {trade.Quantity}");
             });
 
             client.Streams.TradesStream.Subscribe(response =>
             {
                 var trade = response.Data;
-                Log.Information($"Trade normal [{trade.Symbol}] [{(trade.IsBuyerMaker ? "SELL" : "BUY")}] " +
+                Log.Information($"Trade normal [{trade.Symbol}] [{trade.Side}] " +
                                 $"price: {trade.Price} size: {trade.Quantity}");
             });
 

@@ -2,8 +2,8 @@
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Binance.Client.Websocket.Responses;
+using Binance.Client.Websocket.Responses.AggregateTrades;
 using Binance.Client.Websocket.Responses.Books;
-using Binance.Client.Websocket.Responses.TradeBins;
 using Binance.Client.Websocket.Responses.Trades;
 
 namespace Binance.Client.Websocket.Client
