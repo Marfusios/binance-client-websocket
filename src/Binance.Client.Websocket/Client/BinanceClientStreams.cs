@@ -10,7 +10,7 @@ namespace Binance.Client.Websocket.Client
 {
     /// <summary>
     /// All provided streams.
-    /// You need to send subscription request in advance (via method `Send()` on BitmexWebsocketClient)
+    /// You need to set subscriptions in advance (via method `SetSubscriptions()` on BinanceWebsocketClient)
     /// </summary>
     public class BinanceClientStreams
     {
@@ -18,7 +18,7 @@ namespace Binance.Client.Websocket.Client
 
         internal readonly Subject<TradeResponse> TradesSubject = new Subject<TradeResponse>();
         internal readonly Subject<AggregatedTradeResponse> TradeBinSubject = new Subject<AggregatedTradeResponse>();
-        internal readonly Subject<BookResponse> BookSubject = new Subject<BookResponse>();
+        internal readonly Subject<OrderBookPartialResponse> OrderBookPartialSubject = new Subject<OrderBookPartialResponse>();
 
 
         // PUBLIC
@@ -29,7 +29,7 @@ namespace Binance.Client.Websocket.Client
         public IObservable<PongResponse> PongStream => PongSubject.AsObservable();
 
         /// <summary>
-        /// Trades stream - emits every executed trade on Bitmex
+        /// Trades stream - emits every executed trade on Binance
         /// </summary>
         public IObservable<TradeResponse> TradesStream => TradesSubject.AsObservable();
 
@@ -39,8 +39,8 @@ namespace Binance.Client.Websocket.Client
         public IObservable<AggregatedTradeResponse> AggregateTradesStream => TradeBinSubject.AsObservable();
 
         /// <summary>
-        /// Order book stream - emits every update in the order book
+        /// Partial order book stream - emits small snapshot of the order book
         /// </summary>
-        public IObservable<BookResponse> BookStream => BookSubject.AsObservable();
+        public IObservable<OrderBookPartialResponse> OrderBookPartialStream => OrderBookPartialSubject.AsObservable();
     }
 }

@@ -160,7 +160,7 @@ namespace Binance.Client.Websocket.Client
 
                 TradeResponse.TryHandle(response, Streams.TradesSubject) ||
                 AggregatedTradeResponse.TryHandle(response, Streams.TradeBinSubject) ||
-                BookResponse.TryHandle(response, Streams.BookSubject);
+                OrderBookPartialResponse.TryHandle(response, Streams.OrderBookPartialSubject);
         }
     }
 }

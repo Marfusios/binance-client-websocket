@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
@@ -49,8 +50,10 @@ namespace Binance.Client.Websocket.Sample
                     client.SetSubscriptions(
                         new TradeSubscription("btcusdt"),
                         new TradeSubscription("ethbtc"),
-                        new TradeSubscription("bnbbtc"),
-                        new AggregateTradeSubscription("bnbbtc")
+                        new TradeSubscription("bnbusdt"),
+                        new AggregateTradeSubscription("bnbusdt"),
+                        new OrderBookPartialSubscription("btcusdt", 5),
+                        new OrderBookPartialSubscription("bnbusdt", 10)
                         );
                     communicator.Start().Wait();
 
@@ -81,6 +84,14 @@ namespace Binance.Client.Websocket.Sample
                 var trade = response.Data;
                 Log.Information($"Trade normal [{trade.Symbol}] [{(trade.IsBuyerMaker ? "SELL" : "BUY")}] " +
                                 $"price: {trade.Price} size: {trade.Quantity}");
+            });
+
+            client.Streams.OrderBookPartialStream.Subscribe(response =>
+            {
+                var ob = response.Data;
+                Log.Information($"Order book snapshot [{ob.Symbol}] " +
+                                $"bid: {ob.Bids.FirstOrDefault()?.Price:F} " +
+                                $"ask: {ob.Asks.FirstOrDefault()?.Price:F}");
             });
         }
 

@@ -61,8 +61,8 @@ More usage examples:
 | Individual mini tickers|                |
 | All mini tickers       |                |
 | Individual tickers     |                |
-| All ticers             |                |
-| Partial orderbook      |                |
+| All tickers            |                |
+| Partial orderbook      |  ✔            |
 | Diff. orderbook        |                |
 
 **Pull Requests are welcome!**
