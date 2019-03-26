@@ -73,8 +73,6 @@ There is a built-in reconnection which invokes after 1 minute (default) of not r
 
 In the case of Binance outage, there is a built-in functionality which slows down reconnection requests (could be configured via `communicator.ErrorReconnectTimeoutMs`, the default is 1 minute).
 
-Beware that you **need to resubscribe to channels** after reconnection happens. You should subscribe to `Streams.InfoStream`, `Streams.AuthenticationStream` and send subscriptions requests (see [#12](https://github.com/Marfusios/bitfinex-client-websocket/issues/12) for example). 
-
 ### Backtesting
 
 The library is prepared for backtesting. The dependency between `Client` and `Communicator` is via abstraction `IBinanceCommunicator`. There are two communicator implementations: 
