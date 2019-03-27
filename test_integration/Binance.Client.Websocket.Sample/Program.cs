@@ -53,7 +53,8 @@ namespace Binance.Client.Websocket.Sample
                         new TradeSubscription("bnbusdt"),
                         new AggregateTradeSubscription("bnbusdt"),
                         new OrderBookPartialSubscription("btcusdt", 5),
-                        new OrderBookPartialSubscription("bnbusdt", 10)
+                        new OrderBookPartialSubscription("bnbusdt", 10),
+                        new OrderBookDiffSubscription("ltcusdt")
                         );
                     communicator.Start().Wait();
 
@@ -90,6 +91,14 @@ namespace Binance.Client.Websocket.Sample
             {
                 var ob = response.Data;
                 Log.Information($"Order book snapshot [{ob.Symbol}] " +
+                                $"bid: {ob.Bids.FirstOrDefault()?.Price:F} " +
+                                $"ask: {ob.Asks.FirstOrDefault()?.Price:F}");
+            });
+
+            client.Streams.OrderBookDiffStream.Subscribe(response =>
+            {
+                var ob = response.Data;
+                Log.Information($"Order book diff [{ob.Symbol}] " +
                                 $"bid: {ob.Bids.FirstOrDefault()?.Price:F} " +
                                 $"ask: {ob.Asks.FirstOrDefault()?.Price:F}");
             });

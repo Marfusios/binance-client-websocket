@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{40434847-B21B-42AB-A689-66B81C42100A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Bitmex.Client.Websocket.Sample.WinForms</RootNamespace>
-    <AssemblyName>Bitmex.Client.Websocket.Sample.WinForms</AssemblyName>
+    <RootNamespace>Binance.Client.Websocket.Sample.WinForms</RootNamespace>
+    <AssemblyName>Binance.Client.Websocket.Sample.WinForms</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -73,7 +73,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Websocket.Client, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Websocket.Client.3.0.17\lib\netstandard2.0\Websocket.Client.dll</HintPath>
+      <HintPath>..\..\packages\Websocket.Client.3.0.18\lib\netstandard2.0\Websocket.Client.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -101,6 +101,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -117,7 +118,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Bitmex.Client.Websocket\Bitmex.Client.Websocket.csproj">
+    <ProjectReference Include="..\..\src\Binance.Client.Websocket\Binance.Client.Websocket.csproj">
       <Project>{9c5c5c13-33cc-4468-8956-001326282b22}</Project>
       <Name>Bitmex.Client.Websocket</Name>
     </ProjectReference>

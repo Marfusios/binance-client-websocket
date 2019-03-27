@@ -1,4 +1,4 @@
-﻿namespace Bitmex.Client.Websocket.Sample.WinForms.Views
+﻿namespace Binance.Client.Websocket.Sample.WinForms.Views
 {
     partial class Form1
     {
@@ -34,7 +34,6 @@
             this.label9 = new System.Windows.Forms.Label();
             this.tb15MinTrades = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.cbTestNet = new System.Windows.Forms.CheckBox();
             this.tbPair = new System.Windows.Forms.TextBox();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
@@ -160,7 +159,6 @@
             // panel1
             // 
             this.tableLayoutPanel1.SetColumnSpan(this.panel1, 7);
-            this.panel1.Controls.Add(this.cbTestNet);
             this.panel1.Controls.Add(this.tbPair);
             this.panel1.Controls.Add(this.btnStop);
             this.panel1.Controls.Add(this.btnStart);
@@ -169,18 +167,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(888, 34);
             this.panel1.TabIndex = 2;
-            // 
-            // cbTestNet
-            // 
-            this.cbTestNet.AutoSize = true;
-            this.cbTestNet.Dock = System.Windows.Forms.DockStyle.Left;
-            this.cbTestNet.Location = new System.Drawing.Point(244, 0);
-            this.cbTestNet.Name = "cbTestNet";
-            this.cbTestNet.Size = new System.Drawing.Size(64, 34);
-            this.cbTestNet.TabIndex = 7;
-            this.cbTestNet.Text = "TestNet";
-            this.cbTestNet.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.cbTestNet.UseVisualStyleBackColor = true;
             // 
             // tbPair
             // 
@@ -194,7 +180,7 @@
             this.tbPair.Name = "tbPair";
             this.tbPair.Size = new System.Drawing.Size(94, 22);
             this.tbPair.TabIndex = 6;
-            this.tbPair.Text = "XBTUSD";
+            this.tbPair.Text = "btcusdt";
             this.tbPair.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // btnStop
@@ -520,7 +506,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "BitMEX Client";
+            this.Text = "Binance Client";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
@@ -563,7 +549,6 @@
         private System.Windows.Forms.TextBox tb1HoursTrades;
         private System.Windows.Forms.TextBox tb24HoursTrades;
         private System.Windows.Forms.TextBox tbStatus;
-        private System.Windows.Forms.CheckBox cbTestNet;
     }
 }
 

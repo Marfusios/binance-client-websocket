@@ -47,8 +47,8 @@ using (var communicator = new BinanceWebsocketCommunicator(url))
 ```
 
 More usage examples:
-* integration tests ([link](test_integration/Binance.Client.Websocket.Tests.Integration))
 * console sample ([link](test_integration/Binance.Client.Websocket.Sample/Program.cs))
+* integration tests ([link](test_integration/Binance.Client.Websocket.Tests.Integration))
 * desktop sample ([link](test_integration/Binance.Client.Websocket.Sample.WinForms))
 
 ### API coverage
@@ -63,7 +63,7 @@ More usage examples:
 | Individual tickers     |                |
 | All tickers            |                |
 | Partial orderbook      |  ✔            |
-| Diff. orderbook        |                |
+| Diff. orderbook        |  ✔            |
 
 **Pull Requests are welcome!**
 

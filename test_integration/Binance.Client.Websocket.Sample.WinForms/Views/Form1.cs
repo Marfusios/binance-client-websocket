@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Bitmex.Client.Websocket.Sample.WinForms.Views
+namespace Binance.Client.Websocket.Sample.WinForms.Views
 {
     public partial class Form1 : Form, IStatsView
     {
@@ -14,8 +14,6 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Views
         public Action OnInit { get; set; }
         public Action OnStart { get; set; }
         public Action OnStop { get; set; }
-
-        public bool IsTestNet => cbTestNet.Checked;
 
         public string Pair
         {
@@ -126,8 +124,7 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Views
             btnStart.Visible = false;
             btnStop.Visible = true;
             tbPair.Visible = false;
-            tbSelectedPair.Text = $"{tbPair.Text}" + (IsTestNet ? $" (TestNet)" : string.Empty);
-            cbTestNet.Visible = false;
+            tbSelectedPair.Text = tbPair.Text;
             btnStop.Focus();
         }
 
@@ -138,7 +135,6 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Views
             btnStop.Visible = false;
             tbPair.Visible = true;
             tbSelectedPair.Text = string.Empty;
-            cbTestNet.Visible = true;
             btnStart.Focus();
         }
 

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Bitmex.Client.Websocket.Sample.WinForms")]
+[assembly: AssemblyTitle("Binance.Client.Websocket.Sample.WinForms")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Bitmex.Client.Websocket.Sample.WinForms")]
+[assembly: AssemblyProduct("Binance.Client.Websocket.Sample.WinForms")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

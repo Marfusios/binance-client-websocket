@@ -2,19 +2,19 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Bitmex.Client.Websocket.Client;
-using Bitmex.Client.Websocket.Communicator;
-using Bitmex.Client.Websocket.Requests;
-using Bitmex.Client.Websocket.Responses;
-using Bitmex.Client.Websocket.Responses.Books;
-using Bitmex.Client.Websocket.Responses.Trades;
-using Bitmex.Client.Websocket.Sample.WinForms.Statistics;
-using Bitmex.Client.Websocket.Sample.WinForms.Views;
-using Bitmex.Client.Websocket.Websockets;
+using Binance.Client.Websocket.Client;
+using Binance.Client.Websocket.Communicator;
+using Binance.Client.Websocket.Responses;
+using Binance.Client.Websocket.Responses.Books;
+using Binance.Client.Websocket.Responses.Trades;
+using Binance.Client.Websocket.Sample.WinForms.Statistics;
+using Binance.Client.Websocket.Sample.WinForms.Views;
+using Binance.Client.Websocket.Subscriptions;
+using Binance.Client.Websocket.Websockets;
 using Serilog;
 using Websocket.Client;
 
-namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
+namespace Binance.Client.Websocket.Sample.WinForms.Presenters
 {
     class StatsPresenter
     {
@@ -23,13 +23,13 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
         private TradeStatsComputer _tradeStatsComputer;
         private OrderBookStatsComputer _orderBookStatsComputer;
 
-        private IBitmexCommunicator _communicator;
-        private BitmexWebsocketClient _client;
+        private IBinanceCommunicator _communicator;
+        private BinanceWebsocketClient _client;
 
         private IDisposable _pingSubscription;
         private DateTime _pingRequest;
 
-        private readonly string _defaultPair = "XBTUSD";
+        private readonly string _defaultPair = "btcusdt";
         private readonly string _currency = "$";
 
         public StatsPresenter(IStatsView view)
@@ -61,18 +61,15 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
             _tradeStatsComputer = new TradeStatsComputer();
             _orderBookStatsComputer = new OrderBookStatsComputer();
 
-            var url = _view.IsTestNet ? 
-                BitmexValues.ApiWebsocketTestnetUrl :
-                BitmexValues.ApiWebsocketUrl;
-            _communicator = new BitmexWebsocketCommunicator(url);
-            _client = new BitmexWebsocketClient(_communicator);
+            var url = BinanceValues.ApiWebsocketUrl;
+            _communicator = new BinanceWebsocketCommunicator(url);
+            _client = new BinanceWebsocketClient(_communicator);
 
             Subscribe(_client);
 
-            _communicator.ReconnectionHappened.Subscribe(async type =>
+            _communicator.ReconnectionHappened.Subscribe(type =>
             {
                 _view.Status($"Reconnected (type: {type})", StatusType.Info);
-                await SendSubscriptions(_client, pair);
             });
 
             _communicator.DisconnectionHappened.Subscribe(type =>
@@ -87,6 +84,7 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
                     StatusType.Warning);
             });
 
+            SetSubscriptions(_client, pair);
             await _communicator.Start();
 
             StartPingCheck(_client);
@@ -94,7 +92,7 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
 
         private void OnStop()
         {
-            _pingSubscription.Dispose();
+            _pingSubscription?.Dispose();
             _client.Dispose();
             _communicator.Dispose();
             _client = null;
@@ -102,29 +100,26 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
             Clear();
         }
 
-        private void Subscribe(BitmexWebsocketClient client)
+        private void Subscribe(BinanceWebsocketClient client)
         {
             client.Streams.TradesStream.ObserveOn(TaskPoolScheduler.Default).Subscribe(HandleTrades);
-            client.Streams.BookStream.ObserveOn(TaskPoolScheduler.Default).Subscribe(HandleOrderBook);
+            client.Streams.OrderBookPartialStream.ObserveOn(TaskPoolScheduler.Default).Subscribe(HandleOrderBook);
             client.Streams.PongStream.ObserveOn(TaskPoolScheduler.Default).Subscribe(HandlePong);
         }
 
-        private async Task SendSubscriptions(BitmexWebsocketClient client, string pair)
+        private void SetSubscriptions(BinanceWebsocketClient client, string pair)
         {
-            await client.Send(new TradesSubscribeRequest(pair));
-            await client.Send(new BookSubscribeRequest(pair));
+            client.SetSubscriptions(
+                new TradeSubscription(pair),
+                new OrderBookPartialSubscription(pair, 20)
+                );
         }
 
         private void HandleTrades(TradeResponse response)
         {
-            if (response.Action != BitmexAction.Insert && response.Action != BitmexAction.Partial)
-                return;
-
-            foreach (var trade in response.Data)
-            {
-                Log.Information($"Received [{trade.Side}] trade, price: {trade.Price}, amount: {trade.Size}");
-                _tradeStatsComputer.HandleTrade(trade);
-            }
+            var trade = response.Data;
+            Log.Information($"Received [{trade.Side}] trade, price: {trade.Price}, amount: {trade.Quantity}");
+            _tradeStatsComputer.HandleTrade(trade);
 
             FormatTradesStats(_view.Trades1Min, _tradeStatsComputer.GetStatsFor(1));
             FormatTradesStats(_view.Trades5Min, _tradeStatsComputer.GetStatsFor(5));
@@ -146,7 +141,7 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
             setAction($"{trades.SellsPerc:###}% sells{Environment.NewLine}{trades.TotalCount}", Side.Sell);
         }
 
-        private void HandleOrderBook(BookResponse response)
+        private void HandleOrderBook(OrderBookPartialResponse response)
         {
             _orderBookStatsComputer.HandleOrderBook(response);
 
@@ -154,28 +149,28 @@ namespace Bitmex.Client.Websocket.Sample.WinForms.Presenters
             if (stats == OrderBookStats.NULL)
                 return;
 
-            _view.Bid = stats.Bid.ToString("#.0");
-            _view.Ask = stats.Ask.ToString("#.0");
+            _view.Bid = stats.Bid.ToString("#.00");
+            _view.Ask = stats.Ask.ToString("#.00");
 
-            _view.BidAmount = $"{stats.BidAmountPerc:###}%{Environment.NewLine}{FormatToMilions(stats.BidAmount)}";
-            _view.AskAmount = $"{stats.AskAmountPerc:###}%{Environment.NewLine}{FormatToMilions(stats.AskAmount)}";
+            _view.BidAmount = $"{stats.BidAmountPerc:###}%{Environment.NewLine}{FormatToMillions(stats.BidAmount)}";
+            _view.AskAmount = $"{stats.AskAmountPerc:###}%{Environment.NewLine}{FormatToMillions(stats.AskAmount)}";
         }
 
-        private string FormatToMilions(double amount)
+        private string FormatToMillions(double amount)
         {
-            var milions = amount / 1000000;
-            return $"{_currency}{milions:#.00} M";
+            var millions = amount / 1000000;
+            return $"{_currency}{millions:#.00} M";
         }
 
-        private void StartPingCheck(BitmexWebsocketClient client)
+        private void StartPingCheck(BinanceWebsocketClient client)
         {
-            _pingSubscription = Observable
-                .Interval(TimeSpan.FromSeconds(5))
-                .Subscribe(async x =>
-                {
-                    _pingRequest = DateTime.UtcNow;
-                    await client.Send(new PingRequest());
-                });      
+            //_pingSubscription = Observable
+            //    .Interval(TimeSpan.FromSeconds(5))
+            //    .Subscribe(async x =>
+            //    {
+            //        _pingRequest = DateTime.UtcNow;
+            //        await client.Send(new PingRequest());
+            //    });      
         }
 
         private void HandlePong(PongResponse pong)

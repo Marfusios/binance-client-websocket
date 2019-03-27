@@ -19,6 +19,7 @@ namespace Binance.Client.Websocket.Client
         internal readonly Subject<TradeResponse> TradesSubject = new Subject<TradeResponse>();
         internal readonly Subject<AggregatedTradeResponse> TradeBinSubject = new Subject<AggregatedTradeResponse>();
         internal readonly Subject<OrderBookPartialResponse> OrderBookPartialSubject = new Subject<OrderBookPartialResponse>();
+        internal readonly Subject<OrderBookDiffResponse> OrderBookDiffSubject = new Subject<OrderBookDiffResponse>();
 
 
         // PUBLIC
@@ -42,5 +43,10 @@ namespace Binance.Client.Websocket.Client
         /// Partial order book stream - emits small snapshot of the order book
         /// </summary>
         public IObservable<OrderBookPartialResponse> OrderBookPartialStream => OrderBookPartialSubject.AsObservable();
+
+        /// <summary>
+        /// Order book difference stream - emits small snapshot of the order book
+        /// </summary>
+        public IObservable<OrderBookDiffResponse> OrderBookDiffStream => OrderBookDiffSubject.AsObservable();
     }
 }

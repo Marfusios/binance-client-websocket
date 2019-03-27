@@ -1,14 +1,12 @@
 ﻿using System;
 
-namespace Bitmex.Client.Websocket.Sample.WinForms.Views
+namespace Binance.Client.Websocket.Sample.WinForms.Views
 {
     public interface IStatsView
     {
         Action OnInit { get; set; }
         Action OnStart { set; }
         Action OnStop { set; }
-
-        bool IsTestNet { get; }
 
         string Pair { get; set; }
 
