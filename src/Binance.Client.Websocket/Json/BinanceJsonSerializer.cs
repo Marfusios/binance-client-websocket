@@ -12,7 +12,7 @@ namespace Binance.Client.Websocket.Json
         /// <summary>
         /// JSON settings
         /// </summary>
-        public static JsonSerializerSettings Settings => new JsonSerializerSettings
+        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             Formatting = Formatting.None,
@@ -22,7 +22,7 @@ namespace Binance.Client.Websocket.Json
         /// <summary>
         /// Serializer instance
         /// </summary>
-        public static JsonSerializer Serializer => JsonSerializer.Create(Settings);
+        public static readonly JsonSerializer Serializer = JsonSerializer.Create(Settings);
 
         /// <summary>
         /// Deserialize string into object

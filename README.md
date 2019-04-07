@@ -87,7 +87,7 @@ Usage:
 var communicator = new BinanceFileCommunicator();
 communicator.FileNames = new[]
 {
-    "data/binance_raw_xbtusd_2018-11-13.txt"
+    "data/binance_raw_btcusdt_2018-11-13.txt"
 };
 communicator.Delimiter = ";;";
 
