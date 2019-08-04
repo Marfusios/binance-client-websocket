@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.WebSockets;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
@@ -9,6 +10,9 @@ using Websocket.Client;
 
 namespace Binance.Client.Websocket.Files
 {
+    /// <summary>
+    /// Communicator that loads raw backtest data from file and streams
+    /// </summary>
     public class BinanceFileCommunicator : IBinanceCommunicator
     {
         private readonly Subject<ResponseMessage> _messageReceivedSubject = new Subject<ResponseMessage>();
@@ -22,6 +26,8 @@ namespace Binance.Client.Websocket.Files
         public string Name { get; set; }
         public bool IsStarted { get; private set; }
         public bool IsRunning { get; private set; }
+        public bool IsReconnectionEnabled { get; set; }
+        public ClientWebSocket NativeClient { get; }
         public Encoding MessageEncoding { get; set; }
 
         public string[] FileNames { get; set; }
@@ -41,12 +47,27 @@ namespace Binance.Client.Websocket.Files
             return Task.CompletedTask;
         }
 
+        public Task<bool> Stop(WebSocketCloseStatus status, string statusDescription)
+        {
+            return Task.FromResult(true);
+        }
+
         public virtual Task Send(string message)
         {
             return Task.CompletedTask;
         }
 
+        public Task Send(byte[] message)
+        {
+            return Task.CompletedTask;
+        }
+
         public virtual Task SendInstant(string message)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task SendInstant(byte[] message)
         {
             return Task.CompletedTask;
         }
