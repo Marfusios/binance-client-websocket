@@ -50,13 +50,13 @@ namespace Binance.Client.Websocket.Sample
                     SubscribeToStreams(client, communicator);
 
                     client.SetSubscriptions(
-                        //new TradeSubscription("btcusdt"),
+                        new TradeSubscription("btcusdt"),
                         //new TradeSubscription("ethbtc"),
                         //new TradeSubscription("bnbusdt"),
-                        //new AggregateTradeSubscription("bnbusdt"),
-                        new OrderBookPartialSubscription("btcusdt", 5)
+                        new AggregateTradeSubscription("bnbusdt"),
+                        new OrderBookPartialSubscription("btcusdt", 5),
                         //new OrderBookPartialSubscription("bnbusdt", 10),
-                        //new OrderBookDiffSubscription("ltcusdt")
+                        new OrderBookDiffSubscription("ltcusdt")
                         );
                     communicator.Start().Wait();
 

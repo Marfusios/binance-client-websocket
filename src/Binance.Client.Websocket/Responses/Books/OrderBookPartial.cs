@@ -22,11 +22,13 @@ namespace Binance.Client.Websocket.Responses.Books
         /// <summary>
         /// Bid levels
         /// </summary>
+        [JsonProperty("bids")]
         public OrderBookLevel[] Bids { get; set; }
 
         /// <summary>
         /// Asks levels
         /// </summary>
+        [JsonProperty("asks")]
         public OrderBookLevel[] Asks { get; set; }
     }
 }

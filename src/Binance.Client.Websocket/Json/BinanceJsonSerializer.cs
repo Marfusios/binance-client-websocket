@@ -16,7 +16,6 @@ namespace Binance.Client.Websocket.Json
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             Formatting = Formatting.None,
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
             Converters = new List<JsonConverter>()
             {
                 new BinanceStringEnumConverter { CamelCaseText = true},
