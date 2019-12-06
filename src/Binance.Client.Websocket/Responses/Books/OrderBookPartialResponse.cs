@@ -1,7 +1,10 @@
 ﻿using System.Linq;
 using System.Reactive.Subjects;
+using Binance.Client.Websocket.Communicator;
 using Binance.Client.Websocket.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Websocket.Client;
 
 namespace Binance.Client.Websocket.Responses.Books
 {
@@ -31,6 +34,21 @@ namespace Binance.Client.Websocket.Responses.Books
             subject.OnNext(parsed);
 
             return true;
+        }
+
+        /// <summary>
+        /// Stream snapshot manually via communicator
+        /// </summary>
+        public static void StreamFakeSnapshot(OrderBookPartial snapshot, IBinanceCommunicator communicator)
+        {
+            var symbolSafe = (snapshot?.Symbol ?? string.Empty).ToLower();
+            var countSafe = snapshot?.Bids?.Length ?? 0;
+            var response = new OrderBookPartialResponse();
+            response.Data = snapshot;
+            response.Stream = $"{symbolSafe}@depth{countSafe}";
+
+            var serialized = JsonConvert.SerializeObject(response, BinanceJsonSerializer.Settings);
+            communicator.StreamFakeMessage(ResponseMessage.TextMessage(serialized));
         }
     }
 }

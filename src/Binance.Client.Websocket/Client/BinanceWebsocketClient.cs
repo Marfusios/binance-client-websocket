@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Binance.Client.Websocket.Communicator;
 using Binance.Client.Websocket.Exceptions;
 using Binance.Client.Websocket.Json;
@@ -91,14 +90,14 @@ namespace Binance.Client.Websocket.Client
         /// It logs and re-throws every exception. 
         /// </summary>
         /// <param name="request">Request/message to be sent</param>
-        public async Task Send<T>(T request)
+        public void Send<T>(T request)
         {
             try
             {
                 BnbValidations.ValidateInput(request, nameof(request));
 
                 var serialized = BinanceJsonSerializer.Serialize(request);
-                await _communicator.Send(serialized).ConfigureAwait(false);
+                _communicator.Send(serialized);
             }
             catch (Exception e)
             {

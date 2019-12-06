@@ -4,7 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
+using System.Threading.Tasks;
 using Binance.Client.Websocket.Client;
+using Binance.Client.Websocket.Communicator;
 using Binance.Client.Websocket.Subscriptions;
 using Binance.Client.Websocket.Websockets;
 using Serilog;
@@ -39,22 +41,22 @@ namespace Binance.Client.Websocket.Sample
             using (var communicator = new BinanceWebsocketCommunicator(url))
             {
                 communicator.Name = "Binance-1";
-                communicator.ReconnectTimeoutMs = (int)TimeSpan.FromMinutes(10).TotalMilliseconds;
+                communicator.ReconnectTimeout = TimeSpan.FromMinutes(10);
                 communicator.ReconnectionHappened.Subscribe(type =>
                     Log.Information($"Reconnection happened, type: {type}"));
 
                 using (var client = new BinanceWebsocketClient(communicator))
                 {
-                    SubscribeToStreams(client);
+                    SubscribeToStreams(client, communicator);
 
                     client.SetSubscriptions(
-                        new TradeSubscription("btcusdt"),
-                        new TradeSubscription("ethbtc"),
-                        new TradeSubscription("bnbusdt"),
-                        new AggregateTradeSubscription("bnbusdt"),
-                        new OrderBookPartialSubscription("btcusdt", 5),
-                        new OrderBookPartialSubscription("bnbusdt", 10),
-                        new OrderBookDiffSubscription("ltcusdt")
+                        //new TradeSubscription("btcusdt"),
+                        //new TradeSubscription("ethbtc"),
+                        //new TradeSubscription("bnbusdt"),
+                        //new AggregateTradeSubscription("bnbusdt"),
+                        new OrderBookPartialSubscription("btcusdt", 5)
+                        //new OrderBookPartialSubscription("bnbusdt", 10),
+                        //new OrderBookDiffSubscription("ltcusdt")
                         );
                     communicator.Start().Wait();
 
@@ -68,7 +70,7 @@ namespace Binance.Client.Websocket.Sample
             Log.CloseAndFlush();
         }
 
-        private static void SubscribeToStreams(BinanceWebsocketClient client)
+        private static void SubscribeToStreams(BinanceWebsocketClient client, IBinanceCommunicator comm)
         {
             client.Streams.PongStream.Subscribe(x =>
                 Log.Information($"Pong received ({x.Message})"));
@@ -93,6 +95,8 @@ namespace Binance.Client.Websocket.Sample
                 Log.Information($"Order book snapshot [{ob.Symbol}] " +
                                 $"bid: {ob.Bids.FirstOrDefault()?.Price:F} " +
                                 $"ask: {ob.Asks.FirstOrDefault()?.Price:F}");
+                Task.Delay(500).Wait();
+                //OrderBookPartialResponse.StreamFakeSnapshot(response.Data, comm);
             });
 
             client.Streams.OrderBookDiffStream.Subscribe(response =>
