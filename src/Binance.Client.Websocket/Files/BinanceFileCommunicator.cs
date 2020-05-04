@@ -31,6 +31,8 @@ namespace Binance.Client.Websocket.Files
         public ClientWebSocket NativeClient { get; }
         public Encoding MessageEncoding { get; set; }
 
+        public bool IsTextMessageConversionEnabled { get; set; }
+
         public string[] FileNames { get; set; }
         public string Delimiter { get; set; }
         public Encoding Encoding { get; set; } = Encoding.UTF8;
