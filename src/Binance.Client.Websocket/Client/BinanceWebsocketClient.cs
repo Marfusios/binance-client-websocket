@@ -7,6 +7,7 @@ using Binance.Client.Websocket.Logging;
 using Binance.Client.Websocket.Responses;
 using Binance.Client.Websocket.Responses.AggregateTrades;
 using Binance.Client.Websocket.Responses.Books;
+using Binance.Client.Websocket.Responses.MarkPrice;
 using Binance.Client.Websocket.Responses.Trades;
 using Binance.Client.Websocket.Subscriptions;
 using Binance.Client.Websocket.Validations;
@@ -160,8 +161,8 @@ namespace Binance.Client.Websocket.Client
                 TradeResponse.TryHandle(response, Streams.TradesSubject) ||
                 AggregatedTradeResponse.TryHandle(response, Streams.TradeBinSubject) ||
                 OrderBookPartialResponse.TryHandle(response, Streams.OrderBookPartialSubject) || 
-                OrderBookDiffResponse.TryHandle(response, Streams.OrderBookDiffSubject)
-                ;
+                OrderBookDiffResponse.TryHandle(response, Streams.OrderBookDiffSubject) ||
+                FundingResponse.TryHandle(response, Streams.FundingSubject);
         }
     }
 }
