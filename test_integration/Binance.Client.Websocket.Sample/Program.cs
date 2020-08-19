@@ -18,7 +18,7 @@ namespace Binance.Client.Websocket.Sample
     {
         private static readonly ManualResetEvent ExitEvent = new ManualResetEvent(false);
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             InitLogging();
 
@@ -34,31 +34,43 @@ namespace Binance.Client.Websocket.Sample
             Log.Debug("====================================");
             Log.Debug("              STARTING              ");
             Log.Debug("====================================");
-           
 
 
             var url = BinanceValues.ApiWebsocketUrl;
+            var fUrl = BinanceValues.FuturesApiWebsocketUrl;
             using (var communicator = new BinanceWebsocketCommunicator(url))
+            using (var fCommunicator = new BinanceWebsocketCommunicator(fUrl))
             {
                 communicator.Name = "Binance-1";
                 communicator.ReconnectTimeout = TimeSpan.FromMinutes(10);
                 communicator.ReconnectionHappened.Subscribe(type =>
                     Log.Information($"Reconnection happened, type: {type}"));
+                
+                fCommunicator.Name = "Binance-f";
+                fCommunicator.ReconnectTimeout = TimeSpan.FromMinutes(10);
+                fCommunicator.ReconnectionHappened.Subscribe(type =>
+                    Log.Information($"Reconnection happened, type: {type}"));
 
                 using (var client = new BinanceWebsocketClient(communicator))
+                using (var fClient = new BinanceWebsocketClient(fCommunicator))
                 {
                     SubscribeToStreams(client, communicator);
+                    SubscribeToStreams(fClient, communicator);
 
                     client.SetSubscriptions(
-                        new TradeSubscription("btcusdt"),
+                        //new TradeSubscription("btcusdt"),
                         //new TradeSubscription("ethbtc"),
                         //new TradeSubscription("bnbusdt"),
-                        new AggregateTradeSubscription("bnbusdt"),
-                        new OrderBookPartialSubscription("btcusdt", 5),
+                        //new AggregateTradeSubscription("bnbusdt"),
+                        //new OrderBookPartialSubscription("btcusdt", 5),
                         //new OrderBookPartialSubscription("bnbusdt", 10),
-                        new OrderBookDiffSubscription("ltcusdt")
-                        );
+                        new OrderBookDiffSubscription("btcusdt")
+                    );
+                    
+                    fClient.SetSubscriptions(
+                        new FundingSubscription("btcusdt"));
                     communicator.Start().Wait();
+                    fCommunicator.Start().Wait();
 
                     ExitEvent.WaitOne();
                 }
@@ -74,6 +86,14 @@ namespace Binance.Client.Websocket.Sample
         {
             client.Streams.PongStream.Subscribe(x =>
                 Log.Information($"Pong received ({x.Message})"));
+
+            client.Streams.FundingStream.Subscribe(response =>
+            {
+                var funding = response.Data;
+                Log.Information($"Funding: [{funding.Symbol}] rate:[{funding.FundingRate}] " +
+                                $"mark price: {funding.MarkPrice} next funding: {funding.NextFundingTime} " +
+                                $"index price {funding.IndexPrice}");
+            });
 
             client.Streams.AggregateTradesStream.Subscribe(response =>
             {

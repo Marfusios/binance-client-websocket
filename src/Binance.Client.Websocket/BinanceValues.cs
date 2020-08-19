@@ -11,5 +11,7 @@ namespace Binance.Client.Websocket
         /// Main Binance url to websocket API
         /// </summary>
         public static readonly Uri ApiWebsocketUrl = new Uri("wss://stream.binance.com:9443");
+        
+        public static readonly Uri FuturesApiWebsocketUrl = new Uri("wss://fstream.binance.com");
     }
 }
