@@ -45,7 +45,7 @@ namespace Binance.Client.Websocket.Sample
                 communicator.ReconnectTimeout = TimeSpan.FromMinutes(10);
                 communicator.ReconnectionHappened.Subscribe(type =>
                     Log.Information($"Reconnection happened, type: {type}"));
-                
+
                 fCommunicator.Name = "Binance-f";
                 fCommunicator.ReconnectTimeout = TimeSpan.FromMinutes(10);
                 fCommunicator.ReconnectionHappened.Subscribe(type =>
@@ -64,9 +64,10 @@ namespace Binance.Client.Websocket.Sample
                         //new AggregateTradeSubscription("bnbusdt"),
                         //new OrderBookPartialSubscription("btcusdt", 5),
                         //new OrderBookPartialSubscription("bnbusdt", 10),
-                        new OrderBookDiffSubscription("btcusdt")
+                        //new OrderBookDiffSubscription("btcusdt")
+                        new BookTickerSubscription("btcusdt")
                     );
-                    
+
                     fClient.SetSubscriptions(
                         new FundingSubscription("btcusdt"));
                     communicator.Start().Wait();
@@ -125,6 +126,16 @@ namespace Binance.Client.Websocket.Sample
                 Log.Information($"Order book diff [{ob.Symbol}] " +
                                 $"bid: {ob.Bids.FirstOrDefault()?.Price:F} " +
                                 $"ask: {ob.Asks.FirstOrDefault()?.Price:F}");
+            });
+
+            client.Streams.BookTickerStream.Subscribe(response =>
+            {
+                var ob = response.Data;
+                Log.Information($"Book ticker [{ob.Symbol}]" +
+                                $"Best ask price: {ob.BestAskPrice} " +
+                                $"Best ask qty: {ob.BestAskQty} " +
+                                $"Best bid price: {ob.BestBidPrice} " +
+                                $"Best bid qty: {ob.BestBidQty}");
             });
         }
 

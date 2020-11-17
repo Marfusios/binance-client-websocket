@@ -4,6 +4,7 @@ using System.Reactive.Subjects;
 using Binance.Client.Websocket.Responses;
 using Binance.Client.Websocket.Responses.AggregateTrades;
 using Binance.Client.Websocket.Responses.Books;
+using Binance.Client.Websocket.Responses.BookTickers;
 using Binance.Client.Websocket.Responses.MarkPrice;
 using Binance.Client.Websocket.Responses.Trades;
 
@@ -25,6 +26,8 @@ namespace Binance.Client.Websocket.Client
 
         internal readonly Subject<OrderBookDiffResponse> OrderBookDiffSubject = new Subject<OrderBookDiffResponse>();
         internal readonly Subject<FundingResponse> FundingSubject = new Subject<FundingResponse>();
+
+        internal readonly Subject<BookTickerResponse> BookTickerSubject = new Subject<BookTickerResponse>();
 
 
         // PUBLIC
@@ -58,5 +61,10 @@ namespace Binance.Client.Websocket.Client
         /// Mark price and funding rate stream - emits mark price and funding rate for a single symbol pushed every 3 seconds or every second
         /// </summary>
         public IObservable<FundingResponse> FundingStream => FundingSubject.AsObservable();
+
+        /// <summary>
+        ///  The best bid or ask's price or quantity in real-time for a specified symbol
+        /// </summary>
+        public IObservable<BookTickerResponse> BookTickerStream => BookTickerSubject.AsObservable();
     }
 }
