@@ -5,6 +5,7 @@ using Binance.Client.Websocket.Responses;
 using Binance.Client.Websocket.Responses.AggregateTrades;
 using Binance.Client.Websocket.Responses.Books;
 using Binance.Client.Websocket.Responses.BookTickers;
+using Binance.Client.Websocket.Responses.Kline;
 using Binance.Client.Websocket.Responses.MarkPrice;
 using Binance.Client.Websocket.Responses.Trades;
 
@@ -28,6 +29,8 @@ namespace Binance.Client.Websocket.Client
         internal readonly Subject<FundingResponse> FundingSubject = new Subject<FundingResponse>();
 
         internal readonly Subject<BookTickerResponse> BookTickerSubject = new Subject<BookTickerResponse>();
+        
+        internal readonly Subject<KlineResponse> KlineSubject = new Subject<KlineResponse>();
 
 
         // PUBLIC
@@ -66,5 +69,7 @@ namespace Binance.Client.Websocket.Client
         ///  The best bid or ask's price or quantity in real-time for a specified symbol
         /// </summary>
         public IObservable<BookTickerResponse> BookTickerStream => BookTickerSubject.AsObservable();
+
+        public IObservable<KlineResponse> KlineStream => KlineSubject.AsObservable();
     }
 }

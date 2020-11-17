@@ -64,8 +64,9 @@ namespace Binance.Client.Websocket.Sample
                         //new AggregateTradeSubscription("bnbusdt"),
                         //new OrderBookPartialSubscription("btcusdt", 5),
                         //new OrderBookPartialSubscription("bnbusdt", 10),
-                        //new OrderBookDiffSubscription("btcusdt")
-                        new BookTickerSubscription("btcusdt")
+                        //new OrderBookDiffSubscription("btcusdt"),
+                        //new BookTickerSubscription("btcusdt"),
+                        new KlineSubscription("btcusdt", "1m")
                     );
 
                     fClient.SetSubscriptions(
@@ -131,11 +132,33 @@ namespace Binance.Client.Websocket.Sample
             client.Streams.BookTickerStream.Subscribe(response =>
             {
                 var ob = response.Data;
-                Log.Information($"Book ticker [{ob.Symbol}]" +
+                Log.Information($"Book ticker [{ob.Symbol}] " +
                                 $"Best ask price: {ob.BestAskPrice} " +
                                 $"Best ask qty: {ob.BestAskQty} " +
                                 $"Best bid price: {ob.BestBidPrice} " +
                                 $"Best bid qty: {ob.BestBidQty}");
+            });
+
+            client.Streams.KlineStream.Subscribe(response =>
+            {
+                var ob = response.Data;
+                Log.Information($"Kline [{ob.Symbol}] " +
+                                $"Kline start time: {ob.StartTime} " +
+                                $"Kline close time: {ob.CloseTime} " +
+                                $"Interval: {ob.Interval} " +
+                                $"First trade ID: {ob.FirstTradeId} " +
+                                $"Last trade ID: {ob.LastTradeId} " +
+                                $"Open price: {ob.OpenPrice} " +
+                                $"Close price: {ob.ClosePrice} " +
+                                $"High price: {ob.HighPrice} " +
+                                $"Low price: {ob.LowPrice} " +
+                                $"Base asset volume: {ob.BaseAssetVolume} " +
+                                $"Number of trades: {ob.NumberTrades} " +
+                                $"Is this kline closed?: {ob.IsClose} " +
+                                $"Quote asset volume: {ob.QuoteAssetVolume} " +
+                                $"Taker buy base: {ob.TakerBuyBaseAssetVolume} " +
+                                $"Taker buy quote: {ob.TakerBuyQuoteAssetVolume} " +
+                                $"Ignore: {ob.Ignore} ");
             });
         }
 

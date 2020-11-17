@@ -8,6 +8,7 @@ using Binance.Client.Websocket.Responses;
 using Binance.Client.Websocket.Responses.AggregateTrades;
 using Binance.Client.Websocket.Responses.Books;
 using Binance.Client.Websocket.Responses.BookTickers;
+using Binance.Client.Websocket.Responses.Kline;
 using Binance.Client.Websocket.Responses.MarkPrice;
 using Binance.Client.Websocket.Responses.Trades;
 using Binance.Client.Websocket.Subscriptions;
@@ -164,7 +165,8 @@ namespace Binance.Client.Websocket.Client
                 OrderBookPartialResponse.TryHandle(response, Streams.OrderBookPartialSubject) || 
                 OrderBookDiffResponse.TryHandle(response, Streams.OrderBookDiffSubject) ||
                 FundingResponse.TryHandle(response, Streams.FundingSubject) ||
-                BookTickerResponse.TryHandle(response, Streams.BookTickerSubject);
+                BookTickerResponse.TryHandle(response, Streams.BookTickerSubject) ||
+                KlineResponse.TryHandle(response, Streams.KlineSubject);
         }
     }
 }
