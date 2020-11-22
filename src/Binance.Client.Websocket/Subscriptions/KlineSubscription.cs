@@ -18,8 +18,10 @@
 
         private string Interval { get; }
 
+        /// <inheritdoc />
         public override string Channel => "kline";
 
+        /// <inheritdoc />
         public override string StreamName => $"{Symbol}@{Channel}_{Interval}";
         
     }

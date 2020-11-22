@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Binance.Client.Websocket.Responses;
@@ -7,6 +7,7 @@ using Binance.Client.Websocket.Responses.Books;
 using Binance.Client.Websocket.Responses.BookTickers;
 using Binance.Client.Websocket.Responses.Kline;
 using Binance.Client.Websocket.Responses.MarkPrice;
+using Binance.Client.Websocket.Responses.MiniTicker;
 using Binance.Client.Websocket.Responses.Trades;
 
 namespace Binance.Client.Websocket.Client
@@ -31,8 +32,9 @@ namespace Binance.Client.Websocket.Client
         internal readonly Subject<BookTickerResponse> BookTickerSubject = new Subject<BookTickerResponse>();
         
         internal readonly Subject<KlineResponse> KlineSubject = new Subject<KlineResponse>();
-
-
+        
+        internal readonly Subject<MiniTickerResponse> MiniTickerSubject = new Subject<MiniTickerResponse>();
+        
         // PUBLIC
 
         /// <summary>
@@ -70,6 +72,14 @@ namespace Binance.Client.Websocket.Client
         /// </summary>
         public IObservable<BookTickerResponse> BookTickerStream => BookTickerSubject.AsObservable();
 
+        /// <summary>
+        /// The Kline/Candlestick subscription, provide symbol and chart intervals
+        /// </summary>
         public IObservable<KlineResponse> KlineStream => KlineSubject.AsObservable();
+
+        /// <summary>
+        /// Mini-ticker specified symbol statistics for the previous 24hrs
+        /// </summary>
+        public IObservable<MiniTickerResponse> MiniTickerStream => MiniTickerSubject.AsObservable();
     }
 }

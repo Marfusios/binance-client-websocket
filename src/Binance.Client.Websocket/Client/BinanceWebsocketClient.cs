@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Linq;
 using Binance.Client.Websocket.Communicator;
 using Binance.Client.Websocket.Exceptions;
@@ -10,6 +10,7 @@ using Binance.Client.Websocket.Responses.Books;
 using Binance.Client.Websocket.Responses.BookTickers;
 using Binance.Client.Websocket.Responses.Kline;
 using Binance.Client.Websocket.Responses.MarkPrice;
+using Binance.Client.Websocket.Responses.MiniTicker;
 using Binance.Client.Websocket.Responses.Trades;
 using Binance.Client.Websocket.Subscriptions;
 using Binance.Client.Websocket.Validations;
@@ -166,7 +167,8 @@ namespace Binance.Client.Websocket.Client
                 OrderBookDiffResponse.TryHandle(response, Streams.OrderBookDiffSubject) ||
                 FundingResponse.TryHandle(response, Streams.FundingSubject) ||
                 BookTickerResponse.TryHandle(response, Streams.BookTickerSubject) ||
-                KlineResponse.TryHandle(response, Streams.KlineSubject);
+                KlineResponse.TryHandle(response, Streams.KlineSubject) ||
+                MiniTickerResponse.TryHandle(response, Streams.MiniTickerSubject);
         }
     }
 }

@@ -66,7 +66,8 @@ namespace Binance.Client.Websocket.Sample
                         //new OrderBookPartialSubscription("bnbusdt", 10),
                         //new OrderBookDiffSubscription("btcusdt"),
                         //new BookTickerSubscription("btcusdt"),
-                        new KlineSubscription("btcusdt", "1m")
+                        //new KlineSubscription("btcusdt", "1m"),
+                        new MiniTickerSubscription("btcusdt")
                     );
 
                     fClient.SetSubscriptions(
@@ -159,6 +160,18 @@ namespace Binance.Client.Websocket.Sample
                                 $"Taker buy base: {ob.TakerBuyBaseAssetVolume} " +
                                 $"Taker buy quote: {ob.TakerBuyQuoteAssetVolume} " +
                                 $"Ignore: {ob.Ignore} ");
+            });
+
+            client.Streams.MiniTickerStream.Subscribe(response =>
+            {
+                var ob = response.Data;
+                Log.Information($"Mini-ticker [{ob.Symbol}] " +
+                                $"Open price: {ob.OpenPrice} " +
+                                $"Close price: {ob.ClosePrice} " +
+                                $"High price: {ob.HighPrice} " +
+                                $"Low price: {ob.LowPrice} " +
+                                $"Base asset volume: {ob.BaseAssetVolume} " +
+                                $"Quote asset volume: {ob.QuoteAssetVolume}");
             });
         }
 
