@@ -1,10 +1,13 @@
-﻿using System;
+﻿﻿using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Binance.Client.Websocket.Responses;
 using Binance.Client.Websocket.Responses.AggregateTrades;
 using Binance.Client.Websocket.Responses.Books;
+using Binance.Client.Websocket.Responses.BookTickers;
+using Binance.Client.Websocket.Responses.Kline;
 using Binance.Client.Websocket.Responses.MarkPrice;
+using Binance.Client.Websocket.Responses.MiniTicker;
 using Binance.Client.Websocket.Responses.Trades;
 
 namespace Binance.Client.Websocket.Client
@@ -26,7 +29,12 @@ namespace Binance.Client.Websocket.Client
         internal readonly Subject<OrderBookDiffResponse> OrderBookDiffSubject = new Subject<OrderBookDiffResponse>();
         internal readonly Subject<FundingResponse> FundingSubject = new Subject<FundingResponse>();
 
-
+        internal readonly Subject<BookTickerResponse> BookTickerSubject = new Subject<BookTickerResponse>();
+        
+        internal readonly Subject<KlineResponse> KlineSubject = new Subject<KlineResponse>();
+        
+        internal readonly Subject<MiniTickerResponse> MiniTickerSubject = new Subject<MiniTickerResponse>();
+        
         // PUBLIC
 
         /// <summary>
@@ -58,5 +66,20 @@ namespace Binance.Client.Websocket.Client
         /// Mark price and funding rate stream - emits mark price and funding rate for a single symbol pushed every 3 seconds or every second
         /// </summary>
         public IObservable<FundingResponse> FundingStream => FundingSubject.AsObservable();
+
+        /// <summary>
+        ///  The best bid or ask's price or quantity in real-time for a specified symbol
+        /// </summary>
+        public IObservable<BookTickerResponse> BookTickerStream => BookTickerSubject.AsObservable();
+
+        /// <summary>
+        /// The Kline/Candlestick subscription, provide symbol and chart intervals
+        /// </summary>
+        public IObservable<KlineResponse> KlineStream => KlineSubject.AsObservable();
+
+        /// <summary>
+        /// Mini-ticker specified symbol statistics for the previous 24hrs
+        /// </summary>
+        public IObservable<MiniTickerResponse> MiniTickerStream => MiniTickerSubject.AsObservable();
     }
 }

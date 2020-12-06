@@ -45,7 +45,7 @@ namespace Binance.Client.Websocket.Sample
                 communicator.ReconnectTimeout = TimeSpan.FromMinutes(10);
                 communicator.ReconnectionHappened.Subscribe(type =>
                     Log.Information($"Reconnection happened, type: {type}"));
-                
+
                 fCommunicator.Name = "Binance-f";
                 fCommunicator.ReconnectTimeout = TimeSpan.FromMinutes(10);
                 fCommunicator.ReconnectionHappened.Subscribe(type =>
@@ -64,9 +64,12 @@ namespace Binance.Client.Websocket.Sample
                         //new AggregateTradeSubscription("bnbusdt"),
                         //new OrderBookPartialSubscription("btcusdt", 5),
                         //new OrderBookPartialSubscription("bnbusdt", 10),
-                        new OrderBookDiffSubscription("btcusdt")
+                        //new OrderBookDiffSubscription("btcusdt"),
+                        //new BookTickerSubscription("btcusdt"),
+                        //new KlineSubscription("btcusdt", "1m"),
+                        new MiniTickerSubscription("btcusdt")
                     );
-                    
+
                     fClient.SetSubscriptions(
                         new FundingSubscription("btcusdt"));
                     communicator.Start().Wait();
@@ -125,6 +128,50 @@ namespace Binance.Client.Websocket.Sample
                 Log.Information($"Order book diff [{ob.Symbol}] " +
                                 $"bid: {ob.Bids.FirstOrDefault()?.Price:F} " +
                                 $"ask: {ob.Asks.FirstOrDefault()?.Price:F}");
+            });
+
+            client.Streams.BookTickerStream.Subscribe(response =>
+            {
+                var ob = response.Data;
+                Log.Information($"Book ticker [{ob.Symbol}] " +
+                                $"Best ask price: {ob.BestAskPrice} " +
+                                $"Best ask qty: {ob.BestAskQty} " +
+                                $"Best bid price: {ob.BestBidPrice} " +
+                                $"Best bid qty: {ob.BestBidQty}");
+            });
+
+            client.Streams.KlineStream.Subscribe(response =>
+            {
+                var ob = response.Data;
+                Log.Information($"Kline [{ob.Symbol}] " +
+                                $"Kline start time: {ob.StartTime} " +
+                                $"Kline close time: {ob.CloseTime} " +
+                                $"Interval: {ob.Interval} " +
+                                $"First trade ID: {ob.FirstTradeId} " +
+                                $"Last trade ID: {ob.LastTradeId} " +
+                                $"Open price: {ob.OpenPrice} " +
+                                $"Close price: {ob.ClosePrice} " +
+                                $"High price: {ob.HighPrice} " +
+                                $"Low price: {ob.LowPrice} " +
+                                $"Base asset volume: {ob.BaseAssetVolume} " +
+                                $"Number of trades: {ob.NumberTrades} " +
+                                $"Is this kline closed?: {ob.IsClose} " +
+                                $"Quote asset volume: {ob.QuoteAssetVolume} " +
+                                $"Taker buy base: {ob.TakerBuyBaseAssetVolume} " +
+                                $"Taker buy quote: {ob.TakerBuyQuoteAssetVolume} " +
+                                $"Ignore: {ob.Ignore} ");
+            });
+
+            client.Streams.MiniTickerStream.Subscribe(response =>
+            {
+                var ob = response.Data;
+                Log.Information($"Mini-ticker [{ob.Symbol}] " +
+                                $"Open price: {ob.OpenPrice} " +
+                                $"Close price: {ob.ClosePrice} " +
+                                $"High price: {ob.HighPrice} " +
+                                $"Low price: {ob.LowPrice} " +
+                                $"Base asset volume: {ob.BaseAssetVolume} " +
+                                $"Quote asset volume: {ob.QuoteAssetVolume}");
             });
         }
 
