@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5;net6</TargetFrameworks>
     <PackageId>Binance.Client.Websocket</PackageId>
     <Version>2.0.0</Version>
     <Authors>Mariusz Kotas</Authors>
     <Description>Client for Binance websocket API</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>Initial release</PackageReleaseNotes>
-    <Copyright>Copyright 2020 Mariusz Kotas. All rights reserved.</Copyright>
+    <Copyright>Copyright 2021 Mariusz Kotas. All rights reserved.</Copyright>
     <PackageTags>Binance websockets websocket client cryptocurrency exchange bitcosin</PackageTags>
     <PackageLicenseUrl>https://github.com/Marfusios/binance-client-websocket/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Marfusios/binance-client-websocket</PackageProjectUrl>
@@ -31,6 +31,6 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.Reactive" Version="4.4.1" />
-    <PackageReference Include="Websocket.Client" Version="4.3.15" />
+    <PackageReference Include="Websocket.Client" Version="4.4.40" />
   </ItemGroup>
 </Project>
