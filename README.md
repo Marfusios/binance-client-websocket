@@ -24,9 +24,9 @@ https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-so
 var exitEvent = new ManualResetEvent(false);
 var url = BinanceValues.ApiWebsocketUrl;
 
-using (var communicator = new BinanceWebsocketCommunicator(url))
+using (var communicator = new WebsocketClient(url))
 {
-    using (var client = new BinanceWebsocketClient(communicator))
+    using (var client = new BinanceWebsocketClient(NullLogger.Instance, communicator))
     {
         client.Streams.TradesStream.Subscribe(response =>
         {
@@ -109,23 +109,23 @@ In the case of Binance outage, there is a built-in functionality which slows dow
 
 ### Backtesting
 
-The library is prepared for backtesting. The dependency between `Client` and `Communicator` is via abstraction `IBinanceCommunicator`. There are two communicator implementations: 
-* `BinanceWebsocketCommunicator` - a realtime communication with Binance via websocket API.
-* `BinanceFileCommunicator` - a simulated communication, raw data are loaded from files and streamed. If you are **interested in buying historical raw data** (trades, order book events), contact me.
+The library is prepared for backtesting. The dependency between `Client` and `Communicator` is via abstraction `IWebsocketClient`. There are two communicator implementations: 
+* `WebsocketClient` - a realtime communication with Binance via websocket API.
+* `BinanceFileClient` - a simulated communication, raw data are loaded from files and streamed. If you are **interested in buying historical raw data** (trades, order book events), contact me.
 
-Feel free to implement `IBinanceCommunicator` on your own, for example, load raw data from database, cache, etc. 
+Feel free to implement `IWebsocketClient` on your own, for example, load raw data from database, cache, etc. 
 
 Usage: 
 
 ```csharp
-var communicator = new BinanceFileCommunicator();
+var communicator = new BinanceFileClient();
 communicator.FileNames = new[]
 {
     "data/binance_raw_btcusdt_2018-11-13.txt"
 };
 communicator.Delimiter = ";;";
 
-var client = new BinanceWebsocketClient(communicator);
+var client = new BinanceWebsocketClient(NullLogger.Instance, communicator);
 client.Streams.TradesStream.Subscribe(response =>
 {
     // do something with trade

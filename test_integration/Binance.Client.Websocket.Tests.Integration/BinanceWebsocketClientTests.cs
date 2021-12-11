@@ -4,43 +4,36 @@ using System.Threading.Tasks;
 using Binance.Client.Websocket.Client;
 using Binance.Client.Websocket.Responses.Trades;
 using Binance.Client.Websocket.Subscriptions;
-using Binance.Client.Websocket.Websockets;
+using Microsoft.Extensions.Logging.Abstractions;
+using Websocket.Client;
 using Xunit;
 
-namespace Binance.Client.Websocket.Tests.Integration
+namespace Binance.Client.Websocket.Tests.Integration;
+
+public class BinanceWebsocketClientTests
 {
-    public class BinanceWebsocketClientTests
+    [Fact]
+    public async Task Connect_ShouldWorkAndReceiveResponse()
     {
-        [Fact]
-        public async Task Connect_ShouldWorkAndReceiveResponse()
+        var url = BinanceValues.ApiWebsocketUrl;
+        using var apiClient = new WebsocketClient(url);
+
+        TradeResponse received = null;
+        var receivedEvent = new ManualResetEvent(false);
+
+        using var client = new BinanceWebsocketClient(NullLogger.Instance, apiClient, new TradeSubscription("btcusdt"));
+
+        client.Streams.TradesStream.Subscribe(response =>
         {
-            var url = BinanceValues.ApiWebsocketUrl;
-            using (var communicator = new BinanceWebsocketCommunicator(url))
-            {
-                TradeResponse received = null;
-                var receivedEvent = new ManualResetEvent(false);
+            received = response;
+            receivedEvent.Set();
+        });
 
-                using (var client = new BinanceWebsocketClient(communicator))
-                {
+        await apiClient.Start();
 
-                    client.Streams.TradesStream.Subscribe(response =>
-                    {
-                        received = response;
-                        receivedEvent.Set();
-                    });
+        receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
 
-                    client.SetSubscriptions(
-                        new TradeSubscription("btcusdt")
-                        );
-
-                    await communicator.Start();
-
-                    receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
-
-                    Assert.NotNull(received);
-                }
-            }
-        }
-
+        Assert.NotNull(received);
     }
+
 }

@@ -1,17 +1,16 @@
 ﻿using System;
 
-namespace Binance.Client.Websocket
+namespace Binance.Client.Websocket;
+
+/// <summary>
+/// Binance static urls
+/// </summary>
+public static class BinanceValues
 {
     /// <summary>
-    /// Binance static urls
+    /// Main Binance url to websocket API
     /// </summary>
-    public static class BinanceValues
-    {
-        /// <summary>
-        /// Main Binance url to websocket API
-        /// </summary>
-        public static readonly Uri ApiWebsocketUrl = new Uri("wss://stream.binance.com:9443");
+    public static readonly Uri ApiWebsocketUrl = new("wss://stream.binance.com:9443");
         
-        public static readonly Uri FuturesApiWebsocketUrl = new Uri("wss://fstream.binance.com");
-    }
+    public static readonly Uri FuturesApiWebsocketUrl = new("wss://fstream.binance.com");
 }
