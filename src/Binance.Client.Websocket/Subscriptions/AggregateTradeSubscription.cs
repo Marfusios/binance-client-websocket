@@ -1,18 +1,17 @@
-﻿namespace Binance.Client.Websocket.Subscriptions
+﻿namespace Binance.Client.Websocket.Subscriptions;
+
+/// <summary>
+/// Aggregate trade subscription, provide symbol (ethbtc, bnbbtc, etc)
+/// </summary>
+public class AggregateTradeSubscription : SimpleSubscriptionBase
 {
     /// <summary>
     /// Aggregate trade subscription, provide symbol (ethbtc, bnbbtc, etc)
     /// </summary>
-    public class AggregateTradeSubscription : SimpleSubscriptionBase
+    public AggregateTradeSubscription(string symbol) : base(symbol)
     {
-        /// <summary>
-        /// Aggregate trade subscription, provide symbol (ethbtc, bnbbtc, etc)
-        /// </summary>
-        public AggregateTradeSubscription(string symbol) : base(symbol)
-        {
-        }
-
-        /// <inheritdoc />
-        public override string Channel => "aggTrade";
     }
+
+    /// <inheritdoc />
+    public override string Channel => "aggTrade";
 }

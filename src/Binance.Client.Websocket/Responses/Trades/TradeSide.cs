@@ -1,18 +1,17 @@
-﻿namespace Binance.Client.Websocket.Responses.Trades
+﻿namespace Binance.Client.Websocket.Responses.Trades;
+
+/// <summary>
+/// Defines trade side - buy or sell
+/// </summary>
+public enum TradeSide
 {
     /// <summary>
-    /// Defines trade side - buy or sell
+    /// Somebody bought something
     /// </summary>
-    public enum TradeSide
-    {
-        /// <summary>
-        /// Somebody bought something
-        /// </summary>
-        Buy,
+    Buy,
 
-        /// <summary>
-        /// Somebody sold something
-        /// </summary>
-        Sell
-    }
+    /// <summary>
+    /// Somebody sold something
+    /// </summary>
+    Sell
 }
