@@ -177,7 +177,7 @@ namespace Binance.Client.Websocket.Sample
 
         private static void InitLogging()
         {
-            var executingDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var executingDir = AppContext.BaseDirectory;
             var logPath = Path.Combine(executingDir, "logs", "verbose.log");
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
