@@ -54,25 +54,26 @@ namespace Binance.Client.Websocket.Sample
                 using (var client = new BinanceWebsocketClient(communicator))
                 using (var fClient = new BinanceWebsocketClient(fCommunicator))
                 {
-                    SubscribeToStreams(client, communicator);
+                    //SubscribeToStreams(client, communicator);
                     SubscribeToStreams(fClient, communicator);
 
-                    client.SetSubscriptions(
-                        //new TradeSubscription("btcusdt"),
-                        //new TradeSubscription("ethbtc"),
-                        //new TradeSubscription("bnbusdt"),
-                        //new AggregateTradeSubscription("bnbusdt"),
-                        //new OrderBookPartialSubscription("btcusdt", 5),
-                        //new OrderBookPartialSubscription("bnbusdt", 10),
-                        //new OrderBookDiffSubscription("btcusdt"),
-                        //new BookTickerSubscription("btcusdt"),
-                        //new KlineSubscription("btcusdt", "1m"),
-                        new MiniTickerSubscription("btcusdt")
-                    );
+                    //client.SetSubscriptions(
+                    //    //new TradeSubscription("btcusdt"),
+                    //    //new TradeSubscription("ethbtc"),
+                    //    //new TradeSubscription("bnbusdt"),
+                    //    //new AggregateTradeSubscription("bnbusdt"),
+                    //    //new OrderBookPartialSubscription("btcusdt", 5),
+                    //    //new OrderBookPartialSubscription("bnbusdt", 10),
+                    //    //new OrderBookDiffSubscription("btcusdt"),
+                    //    //new BookTickerSubscription("btcusdt"),
+                    //    //new KlineSubscription("btcusdt", "1m"),
+                    //    //new MiniTickerSubscription("btcusdt")
+                    //    new AllMarketMiniTickerSubscription()
+                    //);
 
                     fClient.SetSubscriptions(
-                        new FundingSubscription("btcusdt"));
-                    communicator.Start().Wait();
+                        new AllMarketMiniTickerSubscription());
+                    //communicator.Start().Wait();
                     fCommunicator.Start().Wait();
 
                     ExitEvent.WaitOne();
@@ -172,6 +173,20 @@ namespace Binance.Client.Websocket.Sample
                                 $"Low price: {ob.LowPrice} " +
                                 $"Base asset volume: {ob.BaseAssetVolume} " +
                                 $"Quote asset volume: {ob.QuoteAssetVolume}");
+            });
+            client.Streams.AllMarketMiniTickerStream.Subscribe(response =>
+            {
+                response.Data.ForEach(ob =>
+                {
+
+                    Log.Information($"All market mini-ticker [{ob.Symbol}] " +
+                                    $"Open price: {ob.OpenPrice} " +
+                                    $"Close price: {ob.ClosePrice} " +
+                                    $"High price: {ob.HighPrice} " +
+                                    $"Low price: {ob.LowPrice} " +
+                                    $"Base asset volume: {ob.BaseAssetVolume} " +
+                                    $"Quote asset volume: {ob.QuoteAssetVolume}");
+                });
             });
         }
 

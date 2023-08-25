@@ -13,6 +13,13 @@
         {
             Symbol = (symbol ?? string.Empty).ToLower();
         }
+        /// <summary>
+        /// Create simple subscription for provided symbol
+        /// </summary>
+        protected SimpleSubscriptionBase()
+        {
+
+        }
 
         /// <summary>
         /// Target symbol (bnbbtc, ethbtc, etc)
