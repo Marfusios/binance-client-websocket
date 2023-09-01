@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Linq;
 using Binance.Client.Websocket.Communicator;
 using Binance.Client.Websocket.Exceptions;
@@ -60,7 +60,7 @@ namespace Binance.Client.Websocket.Client
         {
             BnbValidations.ValidateInput(baseUrl, nameof(baseUrl));
 
-            if(subscriptions == null || !subscriptions.Any())
+            if (subscriptions == null || !subscriptions.Any())
                 throw new BinanceBadInputException("Please provide at least one subscription");
 
             var streams = subscriptions.Select(x => x.StreamName).ToArray();
@@ -163,12 +163,14 @@ namespace Binance.Client.Websocket.Client
 
                 TradeResponse.TryHandle(response, Streams.TradesSubject) ||
                 AggregatedTradeResponse.TryHandle(response, Streams.TradeBinSubject) ||
-                OrderBookPartialResponse.TryHandle(response, Streams.OrderBookPartialSubject) || 
+                OrderBookPartialResponse.TryHandle(response, Streams.OrderBookPartialSubject) ||
                 OrderBookDiffResponse.TryHandle(response, Streams.OrderBookDiffSubject) ||
                 FundingResponse.TryHandle(response, Streams.FundingSubject) ||
                 BookTickerResponse.TryHandle(response, Streams.BookTickerSubject) ||
                 KlineResponse.TryHandle(response, Streams.KlineSubject) ||
-                MiniTickerResponse.TryHandle(response, Streams.MiniTickerSubject);
+                MiniTickerResponse.TryHandle(response, Streams.MiniTickerSubject) ||
+                AllMarketMiniTickerResponse.TryHandle(response, Streams.AllMarketMiniTickerSubject);
+
         }
     }
 }

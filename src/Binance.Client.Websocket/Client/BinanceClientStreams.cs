@@ -1,4 +1,5 @@
-﻿﻿using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Binance.Client.Websocket.Responses;
@@ -30,11 +31,13 @@ namespace Binance.Client.Websocket.Client
         internal readonly Subject<FundingResponse> FundingSubject = new Subject<FundingResponse>();
 
         internal readonly Subject<BookTickerResponse> BookTickerSubject = new Subject<BookTickerResponse>();
-        
+
         internal readonly Subject<KlineResponse> KlineSubject = new Subject<KlineResponse>();
-        
+
         internal readonly Subject<MiniTickerResponse> MiniTickerSubject = new Subject<MiniTickerResponse>();
-        
+        internal readonly Subject<AllMarketMiniTickerResponse> AllMarketMiniTickerSubject = new Subject<AllMarketMiniTickerResponse>();
+
+
         // PUBLIC
 
         /// <summary>
@@ -81,5 +84,11 @@ namespace Binance.Client.Websocket.Client
         /// Mini-ticker specified symbol statistics for the previous 24hrs
         /// </summary>
         public IObservable<MiniTickerResponse> MiniTickerStream => MiniTickerSubject.AsObservable();
+        /// <summary>
+        /// Mini-ticker all symbol statistics for the previous 24hrs
+        /// </summary>
+        public IObservable<AllMarketMiniTickerResponse> AllMarketMiniTickerStream => AllMarketMiniTickerSubject.AsObservable();
+
+
     }
 }
