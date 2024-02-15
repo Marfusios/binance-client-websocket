@@ -15,31 +15,26 @@ namespace Binance.Client.Websocket.Tests.Integration
         public async Task Connect_ShouldWorkAndReceiveResponse()
         {
             var url = BinanceValues.ApiWebsocketUrl;
-            using (var communicator = new BinanceWebsocketCommunicator(url))
+            using var communicator = new BinanceWebsocketCommunicator(url);
+            TradeResponse received = null;
+            var receivedEvent = new ManualResetEvent(false);
+
+            using var client = new BinanceWebsocketClient(communicator);
+            client.Streams.TradesStream.Subscribe(response =>
             {
-                TradeResponse received = null;
-                var receivedEvent = new ManualResetEvent(false);
+                received = response;
+                receivedEvent.Set();
+            });
 
-                using (var client = new BinanceWebsocketClient(communicator))
-                {
+            client.SetSubscriptions(
+                new TradeSubscription("btcusdt")
+            );
 
-                    client.Streams.TradesStream.Subscribe(response =>
-                    {
-                        received = response;
-                        receivedEvent.Set();
-                    });
+            await communicator.Start();
 
-                    client.SetSubscriptions(
-                        new TradeSubscription("btcusdt")
-                        );
+            receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
 
-                    await communicator.Start();
-
-                    receivedEvent.WaitOne(TimeSpan.FromSeconds(30));
-
-                    Assert.NotNull(received);
-                }
-            }
+            Assert.NotNull(received);
         }
 
     }
