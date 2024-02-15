@@ -10,9 +10,9 @@ namespace Binance.Client.Websocket.Responses
         /// <summary>
         /// Received pong message
         /// </summary>
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
 
-        internal static bool TryHandle(string response, ISubject<PongResponse> subject)
+        internal static bool TryHandle(string? response, ISubject<PongResponse> subject)
         {
             if (response == null)
                 return false;
@@ -20,7 +20,7 @@ namespace Binance.Client.Websocket.Responses
             if (!response.ToLower().Contains("pong"))
                 return false;
 
-            var parsed = new PongResponse {Message = response};
+            var parsed = new PongResponse { Message = response };
             subject.OnNext(parsed);
             return true;
         }

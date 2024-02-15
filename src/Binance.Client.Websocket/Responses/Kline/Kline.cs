@@ -23,13 +23,13 @@ namespace Binance.Client.Websocket.Responses.Kline
         /// Symbol
         /// </summary>
         [JsonProperty("s")]
-        public string Symbol { get; set; }
+        public string? Symbol { get; set; }
 
         /// <summary>
         /// Interval
         /// </summary>
         [JsonProperty("i")]
-        public string Interval { get; set; }
+        public string? Interval { get; set; }
 
         /// <summary>
         /// First trade ID

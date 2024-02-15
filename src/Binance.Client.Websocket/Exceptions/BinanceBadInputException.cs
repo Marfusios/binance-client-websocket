@@ -2,6 +2,9 @@
 
 namespace Binance.Client.Websocket.Exceptions
 {
+    /// <summary>
+    /// Invalid user input exception
+    /// </summary>
     public class BinanceBadInputException : BinanceException
     {
         public BinanceBadInputException()

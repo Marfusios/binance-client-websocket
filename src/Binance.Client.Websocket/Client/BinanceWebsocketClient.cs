@@ -3,7 +3,6 @@ using System.Linq;
 using Binance.Client.Websocket.Communicator;
 using Binance.Client.Websocket.Exceptions;
 using Binance.Client.Websocket.Json;
-using Binance.Client.Websocket.Logging;
 using Binance.Client.Websocket.Responses;
 using Binance.Client.Websocket.Responses.AggregateTrades;
 using Binance.Client.Websocket.Responses.Books;
@@ -14,6 +13,8 @@ using Binance.Client.Websocket.Responses.MiniTicker;
 using Binance.Client.Websocket.Responses.Trades;
 using Binance.Client.Websocket.Subscriptions;
 using Binance.Client.Websocket.Validations;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
 using Websocket.Client;
 
@@ -26,17 +27,19 @@ namespace Binance.Client.Websocket.Client
     /// </summary>
     public class BinanceWebsocketClient : IDisposable
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
-
         private readonly IBinanceCommunicator _communicator;
         private readonly IDisposable _messageReceivedSubscription;
+        private readonly ILogger<BinanceWebsocketClient> _logger;
 
-        /// <inheritdoc />
-        public BinanceWebsocketClient(IBinanceCommunicator communicator)
+        /// <summary>
+        /// Create instance of BinanceWebsocketClient
+        /// </summary>
+        public BinanceWebsocketClient(IBinanceCommunicator communicator, ILogger<BinanceWebsocketClient>? logger = null)
         {
             BnbValidations.ValidateInput(communicator, nameof(communicator));
 
             _communicator = communicator;
+            _logger = logger ?? NullLogger<BinanceWebsocketClient>.Instance;
             _messageReceivedSubscription = _communicator.MessageReceived.Subscribe(HandleMessage);
         }
 
@@ -94,18 +97,18 @@ namespace Binance.Client.Websocket.Client
         /// It logs and re-throws every exception. 
         /// </summary>
         /// <param name="request">Request/message to be sent</param>
-        public void Send<T>(T request)
+        public bool Send<T>(T request)
         {
             try
             {
                 BnbValidations.ValidateInput(request, nameof(request));
 
-                var serialized = BinanceJsonSerializer.Serialize(request);
-                _communicator.Send(serialized);
+                var serialized = BinanceJsonSerializer.Serialize(request!);
+                return _communicator.Send(serialized);
             }
             catch (Exception e)
             {
-                Log.Error(e, L($"Exception while sending message '{request}'. Error: {e.Message}"));
+                _logger.LogError(e, L("Exception while sending message '{request}'. Error: {error}"), request, e.Message);
                 throw;
             }
         }
@@ -133,11 +136,11 @@ namespace Binance.Client.Websocket.Client
                 if (handled)
                     return;
 
-                Log.Warn(L($"Unhandled response:  '{messageSafe}'"));
+                _logger.LogWarning(L("Unhandled response:  '{message}'"), messageSafe);
             }
             catch (Exception e)
             {
-                Log.Error(e, L("Exception while receiving message"));
+                _logger.LogError(e, L("Exception while receiving message, error: {error}"), e.Message);
             }
         }
 

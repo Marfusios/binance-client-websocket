@@ -1,5 +1,4 @@
 ﻿using System;
-using Binance.Client.Websocket.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -10,12 +9,10 @@ namespace Binance.Client.Websocket.Json
     /// </summary>
     public class BinanceStringEnumConverter : StringEnumConverter
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
-
         /// <summary>
         /// Read JSON string and convert to enum
         /// </summary>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             try
             {
@@ -29,7 +26,6 @@ namespace Binance.Client.Websocket.Json
             }
             catch
             {
-                Log.Warn($"Can't parse enum, value: {reader.Value}, target type: {objectType}, using default '{existingValue}'");
                 return existingValue;
             }
         }

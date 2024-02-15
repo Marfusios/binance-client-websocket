@@ -17,7 +17,7 @@ namespace Binance.Client.Websocket.Responses.BookTickers
         /// The symbol 
         /// </summary>
         [JsonProperty("s")]
-        public string Symbol { get; set; }
+        public string? Symbol { get; set; }
 
         /// <summary>
         /// The best bid price

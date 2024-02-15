@@ -1,12 +1,10 @@
-﻿using System;
-using System.Diagnostics;
-using System.Reactive.Subjects;
+﻿using System.Reactive.Subjects;
 using Binance.Client.Websocket.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Binance.Client.Websocket.Responses.BookTickers
 {
-    public class BookTickerResponse : ResponseBase<BookTickers.BookTicker>
+    public class BookTickerResponse : ResponseBase<BookTicker>
     {
         internal static bool TryHandle(JObject response, ISubject<BookTickerResponse> subject)
         {
@@ -21,8 +19,9 @@ namespace Binance.Client.Websocket.Responses.BookTickers
                 return false;
             }
 
-            var parsed = response.ToObject<BookTickerResponse>(BinanceJsonSerializer.Serializer);
-            subject.OnNext(parsed);
+            var parsed = response!.ToObject<BookTickerResponse>(BinanceJsonSerializer.Serializer);
+            if (parsed != null)
+                subject.OnNext(parsed);
 
             return true;
         }

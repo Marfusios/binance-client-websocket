@@ -11,7 +11,7 @@ namespace Binance.Client.Websocket.Responses.Books
         /// The symbol the update is for
         /// </summary>
         [JsonProperty("s")]
-        public string Symbol { get; set; }
+        public string? Symbol { get; set; }
 
         /// <summary>
         /// The ID of the last update (final)
@@ -29,12 +29,12 @@ namespace Binance.Client.Websocket.Responses.Books
         /// The list of bids
         /// </summary>
         [JsonProperty("b")]
-        public OrderBookLevel[] Bids { get; set; }
+        public OrderBookLevel[]? Bids { get; set; }
 
         /// <summary>
         /// The list of asks
         /// </summary>
         [JsonProperty("a")]
-        public OrderBookLevel[] Asks { get; set; }
+        public OrderBookLevel[]? Asks { get; set; }
     }
 }

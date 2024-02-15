@@ -19,8 +19,9 @@ namespace Binance.Client.Websocket.Responses.Kline
                 return false;
             }
 
-            var parsed = response.ToObject<KlineResponse>(BinanceJsonSerializer.Serializer);
-            subject.OnNext(parsed);
+            var parsed = response!.ToObject<KlineResponse>(BinanceJsonSerializer.Serializer);
+            if (parsed != null)
+                subject.OnNext(parsed);
 
             return true;
         }

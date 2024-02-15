@@ -16,9 +16,9 @@ namespace Binance.Client.Websocket.Json
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             Formatting = Formatting.None,
-            Converters = new List<JsonConverter>()
+            Converters = new List<JsonConverter>
             {
-                new BinanceStringEnumConverter { CamelCaseText = true},
+                new BinanceStringEnumConverter { NamingStrategy = new CamelCaseNamingStrategy()},
             }
         };
 
@@ -30,7 +30,7 @@ namespace Binance.Client.Websocket.Json
         /// <summary>
         /// Deserialize string into object
         /// </summary>
-        public static T Deserialize<T>(string data)
+        public static T? Deserialize<T>(string data) where T : class
         {
             return JsonConvert.DeserializeObject<T>(data, Settings);
         }
@@ -38,7 +38,7 @@ namespace Binance.Client.Websocket.Json
         /// <summary>
         /// Serialize object into JSON string
         /// </summary>
-        public static string Serialize(object data)
+        public static string Serialize(object? data)
         {
             return JsonConvert.SerializeObject(data, Settings);
         }

@@ -16,8 +16,9 @@ namespace Binance.Client.Websocket.Responses.AggregateTrades
             if (stream == null || !stream.ToLower().EndsWith("@aggtrade"))
                 return false;
 
-            var parsed = response.ToObject<AggregatedTradeResponse>(BinanceJsonSerializer.Serializer);
-            subject.OnNext(parsed);
+            var parsed = response!.ToObject<AggregatedTradeResponse>(BinanceJsonSerializer.Serializer);
+            if (parsed != null)
+                subject.OnNext(parsed);
 
             return true;
         }

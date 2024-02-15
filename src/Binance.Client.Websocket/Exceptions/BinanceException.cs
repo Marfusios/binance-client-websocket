@@ -2,6 +2,9 @@
 
 namespace Binance.Client.Websocket.Exceptions
 {
+    /// <summary>
+    /// Base exception for Binance client
+    /// </summary>
     public class BinanceException : Exception
     {
         public BinanceException()

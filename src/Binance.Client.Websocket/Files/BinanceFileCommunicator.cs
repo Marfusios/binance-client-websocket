@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Binance.Client.Websocket.Communicator;
 using Websocket.Client;
-using Websocket.Client.Models;
 
 namespace Binance.Client.Websocket.Files
 {
@@ -20,10 +19,11 @@ namespace Binance.Client.Websocket.Files
 
         public IObservable<ResponseMessage> MessageReceived => _messageReceivedSubject.AsObservable();
         public IObservable<ReconnectionInfo> ReconnectionHappened => Observable.Empty<ReconnectionInfo>();
-        public IObservable<DisconnectionInfo> DisconnectionHappened  => Observable.Empty<DisconnectionInfo>();
+        public IObservable<DisconnectionInfo> DisconnectionHappened => Observable.Empty<DisconnectionInfo>();
 
         public TimeSpan? ReconnectTimeout { get; set; } = TimeSpan.FromSeconds(60);
         public TimeSpan? ErrorReconnectTimeout { get; set; } = TimeSpan.FromSeconds(60);
+        public TimeSpan? LostReconnectTimeout { get; set; }
         public string Name { get; set; }
         public bool IsStarted { get; private set; }
         public bool IsRunning { get; private set; }
@@ -36,16 +36,17 @@ namespace Binance.Client.Websocket.Files
         public string[] FileNames { get; set; }
         public string Delimiter { get; set; }
         public Encoding Encoding { get; set; } = Encoding.UTF8;
-        public void StreamFakeMessage(ResponseMessage message)
-        {
-            throw new NotImplementedException();
-        }
 
         public Uri Url { get; set; }
 
+        public void StreamFakeMessage(ResponseMessage message)
+        {
+            _messageReceivedSubject.OnNext(message);
+        }
+
         public virtual void Dispose()
         {
-            
+
         }
 
         public virtual Task Start()
@@ -70,16 +71,19 @@ namespace Binance.Client.Websocket.Files
             return Task.FromResult(true);
         }
 
-        public virtual void Send(string message)
+        public virtual bool Send(string message)
         {
+            return true;
         }
 
-        public void Send(byte[] message)
+        public bool Send(byte[] message)
         {
+            return true;
         }
 
-        public void Send(ArraySegment<byte> message)
+        public bool Send(ArraySegment<byte> message)
         {
+            return true;
         }
 
         public virtual Task SendInstant(string message)
@@ -92,6 +96,16 @@ namespace Binance.Client.Websocket.Files
             return Task.CompletedTask;
         }
 
+        public bool SendAsText(byte[] message)
+        {
+            return true;
+        }
+
+        public bool SendAsText(ArraySegment<byte> message)
+        {
+            return true;
+        }
+
         public Task Reconnect()
         {
             return Task.CompletedTask;
@@ -99,14 +113,14 @@ namespace Binance.Client.Websocket.Files
 
         public Task ReconnectOrFail()
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         private void StartStreaming()
         {
             if (FileNames == null)
                 throw new InvalidOperationException("FileNames are not set, provide at least one path to historical data");
-            if(string.IsNullOrEmpty(Delimiter))
+            if (string.IsNullOrEmpty(Delimiter))
                 throw new InvalidOperationException("Delimiter is not set (separator between messages in the file)");
 
             foreach (var fileName in FileNames)
@@ -115,29 +129,29 @@ namespace Binance.Client.Websocket.Files
                 var stream = new StreamReader(fs, Encoding);
                 using (stream)
                 {
-                    var message = ReadByDelimeter(stream, Delimiter);
+                    var message = ReadByDelimiter(stream, Delimiter);
                     while (message != null)
                     {
                         _messageReceivedSubject.OnNext(ResponseMessage.TextMessage(message));
-                        message = ReadByDelimeter(stream, Delimiter);
+                        message = ReadByDelimiter(stream, Delimiter);
                     }
                 }
             }
         }
 
- 
-        private static string ReadByDelimeter(StreamReader sr, string delimiter)
+
+        private static string ReadByDelimiter(StreamReader sr, string delimiter)
         {
             var line = new StringBuilder();
             int matchIndex = 0;
 
             while (sr.Peek() > 0)
-            {               
+            {
                 var nextChar = (char)sr.Read();
                 line.Append(nextChar);
                 if (nextChar == delimiter[matchIndex])
                 {
-                    if(matchIndex == delimiter.Length - 1)
+                    if (matchIndex == delimiter.Length - 1)
                     {
                         return line.ToString().Substring(0, line.Length - delimiter.Length);
                     }

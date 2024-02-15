@@ -13,7 +13,7 @@ namespace Binance.Client.Websocket.Responses.Trades
         /// The symbol the trade was for
         /// </summary>
         [JsonProperty("s")]
-        public string Symbol { get; set; }
+        public string? Symbol { get; set; }
 
         /// <summary>
         /// The id of this aggregated trade
@@ -56,7 +56,7 @@ namespace Binance.Client.Websocket.Responses.Trades
         /// </summary>
         [JsonProperty("m")]
         public bool IsBuyerMaker { get; set; }
-        
+
         /// <summary>
         /// Was the trade the best price match?
         /// </summary>

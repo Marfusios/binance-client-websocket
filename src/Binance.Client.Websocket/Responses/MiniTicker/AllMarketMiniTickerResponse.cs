@@ -18,8 +18,9 @@ namespace Binance.Client.Websocket.Responses.MiniTicker
                 return false;
             }
 
-            var parsed = response.ToObject<AllMarketMiniTickerResponse>(BinanceJsonSerializer.Serializer);
-            subject.OnNext(parsed);
+            var parsed = response!.ToObject<AllMarketMiniTickerResponse>(BinanceJsonSerializer.Serializer);
+            if (parsed != null)
+                subject.OnNext(parsed);
 
             return true;
         }

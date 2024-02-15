@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Reactive.Subjects;
+﻿using System.Reactive.Subjects;
 using Binance.Client.Websocket.Json;
 using Newtonsoft.Json.Linq;
 
@@ -23,8 +22,9 @@ namespace Binance.Client.Websocket.Responses.Books
                 return false;
             }
 
-            var parsed = response.ToObject<OrderBookDiffResponse>(BinanceJsonSerializer.Serializer);
-            subject.OnNext(parsed);
+            var parsed = response!.ToObject<OrderBookDiffResponse>(BinanceJsonSerializer.Serializer);
+            if (parsed != null)
+                subject.OnNext(parsed);
 
             return true;
         }

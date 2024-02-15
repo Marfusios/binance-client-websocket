@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,18 +8,20 @@ using Binance.Client.Websocket.Client;
 using Binance.Client.Websocket.Communicator;
 using Binance.Client.Websocket.Subscriptions;
 using Binance.Client.Websocket.Websockets;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
+using Serilog.Extensions.Logging;
 
 namespace Binance.Client.Websocket.Sample
 {
     class Program
     {
-        private static readonly ManualResetEvent ExitEvent = new ManualResetEvent(false);
+        private static readonly ManualResetEvent ExitEvent = new(false);
 
         static async Task Main(string[] args)
         {
-            InitLogging();
+            var logger = InitLogging();
 
             AppDomain.CurrentDomain.ProcessExit += CurrentDomainOnProcessExit;
             AssemblyLoadContext.Default.Unloading += DefaultOnUnloading;
@@ -38,8 +39,8 @@ namespace Binance.Client.Websocket.Sample
 
             var url = BinanceValues.ApiWebsocketUrl;
             var fUrl = BinanceValues.FuturesApiWebsocketUrl;
-            using (var communicator = new BinanceWebsocketCommunicator(url))
-            using (var fCommunicator = new BinanceWebsocketCommunicator(fUrl))
+            using (var communicator = new BinanceWebsocketCommunicator(url, logger.CreateLogger<BinanceWebsocketCommunicator>()))
+            using (var fCommunicator = new BinanceWebsocketCommunicator(fUrl, logger.CreateLogger<BinanceWebsocketCommunicator>()))
             {
                 communicator.Name = "Binance-1";
                 communicator.ReconnectTimeout = TimeSpan.FromMinutes(10);
@@ -51,30 +52,30 @@ namespace Binance.Client.Websocket.Sample
                 fCommunicator.ReconnectionHappened.Subscribe(type =>
                     Log.Information($"Reconnection happened, type: {type}"));
 
-                using (var client = new BinanceWebsocketClient(communicator))
-                using (var fClient = new BinanceWebsocketClient(fCommunicator))
+                using (var client = new BinanceWebsocketClient(communicator, logger.CreateLogger<BinanceWebsocketClient>()))
+                using (var fClient = new BinanceWebsocketClient(fCommunicator, logger.CreateLogger<BinanceWebsocketClient>()))
                 {
-                    //SubscribeToStreams(client, communicator);
-                    SubscribeToStreams(fClient, communicator);
+                    SubscribeToStreams(client, communicator);
+                    //SubscribeToStreams(fClient, communicator);
 
-                    //client.SetSubscriptions(
-                    //    //new TradeSubscription("btcusdt"),
-                    //    //new TradeSubscription("ethbtc"),
-                    //    //new TradeSubscription("bnbusdt"),
-                    //    //new AggregateTradeSubscription("bnbusdt"),
-                    //    //new OrderBookPartialSubscription("btcusdt", 5),
-                    //    //new OrderBookPartialSubscription("bnbusdt", 10),
-                    //    //new OrderBookDiffSubscription("btcusdt"),
-                    //    //new BookTickerSubscription("btcusdt"),
-                    //    //new KlineSubscription("btcusdt", "1m"),
-                    //    //new MiniTickerSubscription("btcusdt")
-                    //    new AllMarketMiniTickerSubscription()
-                    //);
+                    client.SetSubscriptions(
+                    new TradeSubscription("btcusdt"),
+                    //new TradeSubscription("ethbtc"),
+                    //new TradeSubscription("bnbusdt"),
+                    //new AggregateTradeSubscription("bnbusdt"),
+                    new OrderBookPartialSubscription("btcusdt", 5)
+                    //new OrderBookPartialSubscription("bnbusdt", 10),
+                    //new OrderBookDiffSubscription("btcusdt"),
+                    //new BookTickerSubscription("btcusdt"),
+                    //new KlineSubscription("btcusdt", "1m"),
+                    //new MiniTickerSubscription("btcusdt")
+                    //new AllMarketMiniTickerSubscription()
+                    );
 
-                    fClient.SetSubscriptions(
-                        new AllMarketMiniTickerSubscription());
-                    //communicator.Start().Wait();
-                    fCommunicator.Start().Wait();
+                    //fClient.SetSubscriptions(
+                    //    new AllMarketMiniTickerSubscription());
+                    communicator.Start().Wait();
+                    //fCommunicator.Start().Wait();
 
                     ExitEvent.WaitOne();
                 }
@@ -89,7 +90,7 @@ namespace Binance.Client.Websocket.Sample
         private static void SubscribeToStreams(BinanceWebsocketClient client, IBinanceCommunicator comm)
         {
             client.Streams.PongStream.Subscribe(x =>
-                Log.Information($"Pong received ({x.Message})"));
+                Log.Information("Pong received ({message})", x.Message));
 
             client.Streams.FundingStream.Subscribe(response =>
             {
@@ -109,18 +110,19 @@ namespace Binance.Client.Websocket.Sample
             client.Streams.TradesStream.Subscribe(response =>
             {
                 var trade = response.Data;
-                Log.Information($"Trade normal [{trade.Symbol}] [{trade.Side}] " +
-                                $"price: {trade.Price} size: {trade.Quantity}");
+                Log.Information("Trade normal [{symbol}] [{side}] " +
+                                "price: {price} size: {size}", trade.Symbol, trade.Side, trade.Price, trade.Quantity);
             });
 
             client.Streams.OrderBookPartialStream.Subscribe(response =>
             {
                 var ob = response.Data;
-                Log.Information($"Order book snapshot [{ob.Symbol}] " +
-                                $"bid: {ob.Bids.FirstOrDefault()?.Price:F} " +
-                                $"ask: {ob.Asks.FirstOrDefault()?.Price:F}");
-                Task.Delay(500).Wait();
-                //OrderBookPartialResponse.StreamFakeSnapshot(response.Data, comm);
+                Log.Information("Order book snapshot [{symbol}] " +
+                                "bid: {bid} " +
+                                "ask: {ask}",
+                    ob?.Symbol,
+                    ob?.Bids?.FirstOrDefault()?.Price.ToString("F"),
+                    ob?.Asks?.FirstOrDefault()?.Price.ToString("F"));
             });
 
             client.Streams.OrderBookDiffStream.Subscribe(response =>
@@ -190,15 +192,17 @@ namespace Binance.Client.Websocket.Sample
             });
         }
 
-        private static void InitLogging()
+        private static SerilogLoggerFactory InitLogging()
         {
             var executingDir = AppContext.BaseDirectory;
             var logPath = Path.Combine(executingDir, "logs", "verbose.log");
-            Log.Logger = new LoggerConfiguration()
+            var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
-                .WriteTo.ColoredConsole(LogEventLevel.Debug)
+                .WriteTo.Console(LogEventLevel.Debug)
                 .CreateLogger();
+            Log.Logger = logger;
+            return new SerilogLoggerFactory(logger);
         }
 
         private static void CurrentDomainOnProcessExit(object sender, EventArgs eventArgs)

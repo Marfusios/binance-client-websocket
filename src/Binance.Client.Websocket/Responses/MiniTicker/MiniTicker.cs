@@ -1,4 +1,4 @@
-﻿﻿﻿using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Binance.Client.Websocket.Responses.MiniTicker
 {
@@ -11,7 +11,7 @@ namespace Binance.Client.Websocket.Responses.MiniTicker
         /// The symbol the trade was for
         /// </summary>
         [JsonProperty("s")]
-        public string Symbol { get; set; }
+        public string? Symbol { get; set; }
 
         /// <summary>
         /// Close price

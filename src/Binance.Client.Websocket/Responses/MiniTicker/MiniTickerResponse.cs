@@ -1,4 +1,4 @@
-﻿﻿﻿using System.Reactive.Subjects;
+﻿using System.Reactive.Subjects;
 using Binance.Client.Websocket.Json;
 using Newtonsoft.Json.Linq;
 
@@ -17,8 +17,9 @@ namespace Binance.Client.Websocket.Responses.MiniTicker
                 return false;
             }
 
-            var parsed = response.ToObject<MiniTickerResponse>(BinanceJsonSerializer.Serializer);
-            subject.OnNext(parsed);
+            var parsed = response!.ToObject<MiniTickerResponse>(BinanceJsonSerializer.Serializer);
+            if (parsed != null)
+                subject.OnNext(parsed);
 
             return true;
         }

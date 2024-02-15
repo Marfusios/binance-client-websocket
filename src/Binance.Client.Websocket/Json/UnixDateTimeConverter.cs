@@ -14,8 +14,9 @@ namespace Binance.Client.Websocket.Json
         /// <summary>
         /// Serialize DateTime into Unix milliseconds
         /// </summary>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
+            if (value == null) { return; }
             var subtracted = ((DateTime)value).Subtract(BinanceTime.UnixBase);
             writer.WriteRawValue(subtracted.TotalMilliseconds.ToString(CultureInfo.InvariantCulture));
         }
@@ -23,7 +24,7 @@ namespace Binance.Client.Websocket.Json
         /// <summary>
         /// Deserialize Unix milliseconds into DateTime
         /// </summary>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (reader.Value == null) { return null; }
             return BinanceTime.ConvertToTime((long)reader.Value);
