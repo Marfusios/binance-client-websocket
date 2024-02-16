@@ -12,7 +12,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/Marfusios/binance-client-websocket</PackageProjectUrl>
 		<PackageIconUrl>https://raw.githubusercontent.com/Marfusios/binance-client-websocket/master/src/Binance.Client.Websocket/binance-icon.png</PackageIconUrl>
-		<PackageIcon>binance-icon.png</PackageIcon>
+		<PackageIcon>icon.png</PackageIcon>
 		<RepositoryUrl>https://github.com/Marfusios/binance-client-websocket</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryType>Git</RepositoryType>
@@ -31,7 +31,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="binance-icon.png" Pack="true" PackagePath="" />
+		<None Include="icon.png" Pack="true" PackagePath="" />
 		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 </Project>

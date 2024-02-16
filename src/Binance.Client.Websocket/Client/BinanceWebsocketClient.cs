@@ -49,6 +49,11 @@ namespace Binance.Client.Websocket.Client
         public BinanceClientStreams Streams { get; } = new BinanceClientStreams();
 
         /// <summary>
+        /// Expose logger for this client
+        /// </summary>
+        public ILogger<BinanceWebsocketClient> Logger => _logger;
+
+        /// <summary>
         /// Cleanup everything
         /// </summary>
         public void Dispose()

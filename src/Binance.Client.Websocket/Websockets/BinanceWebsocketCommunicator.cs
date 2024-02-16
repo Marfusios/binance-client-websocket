@@ -10,13 +10,13 @@ namespace Binance.Client.Websocket.Websockets
     public class BinanceWebsocketCommunicator : WebsocketClient, IBinanceCommunicator
     {
         /// <inheritdoc />
-        public BinanceWebsocketCommunicator(Uri url, Func<ClientWebSocket> clientFactory = null)
+        public BinanceWebsocketCommunicator(Uri url, Func<ClientWebSocket>? clientFactory = null)
             : base(url, clientFactory)
         {
         }
 
         /// <inheritdoc />
-        public BinanceWebsocketCommunicator(Uri url, ILogger<BinanceWebsocketCommunicator> logger, Func<ClientWebSocket> clientFactory = null)
+        public BinanceWebsocketCommunicator(Uri url, ILogger<BinanceWebsocketCommunicator> logger, Func<ClientWebSocket>? clientFactory = null)
             : base(url, logger, clientFactory)
         {
         }
