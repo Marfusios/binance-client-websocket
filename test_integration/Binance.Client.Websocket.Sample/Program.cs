@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Binance.Client.Websocket.Client;
 using Binance.Client.Websocket.Communicator;
+using Binance.Client.Websocket.Signing;
 using Binance.Client.Websocket.Subscriptions;
 using Binance.Client.Websocket.Websockets;
 using Microsoft.Extensions.Logging;
@@ -19,6 +20,9 @@ namespace Binance.Client.Websocket.Sample
     {
         private static readonly ManualResetEvent ExitEvent = new(false);
 
+        private const string ApiKey = "";
+        private const string ApiSecret = "";
+        
         static async Task Main(string[] args)
         {
             var logger = InitLogging();
@@ -44,14 +48,18 @@ namespace Binance.Client.Websocket.Sample
             {
                 communicator.Name = "Binance-1";
                 communicator.ReconnectTimeout = TimeSpan.FromMinutes(10);
-                communicator.ReconnectionHappened.Subscribe(type =>
-                    Log.Information($"Reconnection happened, type: {type}"));
+                communicator.ReconnectionHappened.Subscribe(info =>
+                    Log.Information("Reconnection happened, type: {type}", info.Type));
+                communicator.DisconnectionHappened.Subscribe(info =>
+                    Log.Information("Disconnection happened, type: {type}", info.Type));
 
                 fCommunicator.Name = "Binance-f";
                 fCommunicator.ReconnectTimeout = TimeSpan.FromMinutes(10);
-                fCommunicator.ReconnectionHappened.Subscribe(type =>
-                    Log.Information($"Reconnection happened, type: {type}"));
-
+                fCommunicator.ReconnectionHappened.Subscribe(info =>
+                    Log.Information("Reconnection happened, type: {type}", info.Type));
+                fCommunicator.DisconnectionHappened.Subscribe(info =>
+                    Log.Information("Disconnection happened, type: {type}", info.Type));
+                
                 using (var client = new BinanceWebsocketClient(communicator, logger.CreateLogger<BinanceWebsocketClient>()))
                 using (var fClient = new BinanceWebsocketClient(fCommunicator, logger.CreateLogger<BinanceWebsocketClient>()))
                 {
@@ -74,7 +82,13 @@ namespace Binance.Client.Websocket.Sample
 
                     //fClient.SetSubscriptions(
                     //    new AllMarketMiniTickerSubscription());
-                    communicator.Start().Wait();
+                    
+                    if (!string.IsNullOrWhiteSpace(ApiSecret))
+                    {
+                        await communicator.Authenticate(ApiKey, new BinanceHmac(ApiSecret));
+                    }
+                    
+                    await communicator.Start();
                     //fCommunicator.Start().Wait();
 
                     ExitEvent.WaitOne();
@@ -189,6 +203,13 @@ namespace Binance.Client.Websocket.Sample
                                     $"Base asset volume: {ob.BaseAssetVolume} " +
                                     $"Quote asset volume: {ob.QuoteAssetVolume}");
                 });
+            });
+
+            client.Streams.OrderUpdateStream.Subscribe(order =>
+            {
+                Log.Information("Order {type} {side} updated, amount: {quantity}, price: {price}. Filled: {filled}. " +
+                                "Status: {status}, execution: {executionType}", 
+                    order.Type, order.Side, order.Quantity, order.Price, order.QuantityFilled, order.Status, order.ExecutionType);
             });
         }
 

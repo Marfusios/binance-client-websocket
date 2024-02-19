@@ -9,7 +9,7 @@ namespace Binance.Client.Websocket.Responses.Trades
     /// </summary>
     public class TradeResponse : ResponseBase<Trade>
     {
-        internal static bool TryHandle(JObject response, ISubject<TradeResponse> subject)
+        internal static bool TryHandle(JObject? response, ISubject<TradeResponse> subject)
         {
             var stream = response?["stream"]?.Value<string>();
             if (stream == null || !stream.ToLower().EndsWith("@trade"))

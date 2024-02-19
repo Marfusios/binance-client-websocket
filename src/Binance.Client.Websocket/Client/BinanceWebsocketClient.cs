@@ -10,6 +10,7 @@ using Binance.Client.Websocket.Responses.BookTickers;
 using Binance.Client.Websocket.Responses.Kline;
 using Binance.Client.Websocket.Responses.MarkPrice;
 using Binance.Client.Websocket.Responses.MiniTicker;
+using Binance.Client.Websocket.Responses.Orders;
 using Binance.Client.Websocket.Responses.Trades;
 using Binance.Client.Websocket.Subscriptions;
 using Binance.Client.Websocket.Validations;
@@ -156,7 +157,8 @@ namespace Binance.Client.Websocket.Client
             // ********************
 
             return
-                PongResponse.TryHandle(msg, Streams.PongSubject);
+                PongResponse.TryHandle(msg, Streams.PongSubject) ||
+                LogUnhandled(msg);
         }
 
         private bool HandleObjectMessage(string msg)
@@ -168,17 +170,23 @@ namespace Binance.Client.Websocket.Client
             // ********************
 
             return
-
                 TradeResponse.TryHandle(response, Streams.TradesSubject) ||
                 AggregatedTradeResponse.TryHandle(response, Streams.TradeBinSubject) ||
                 OrderBookPartialResponse.TryHandle(response, Streams.OrderBookPartialSubject) ||
                 OrderBookDiffResponse.TryHandle(response, Streams.OrderBookDiffSubject) ||
+                OrderUpdate.TryHandle(response, Streams.OrderUpdateSubject) ||
                 FundingResponse.TryHandle(response, Streams.FundingSubject) ||
                 BookTickerResponse.TryHandle(response, Streams.BookTickerSubject) ||
                 KlineResponse.TryHandle(response, Streams.KlineSubject) ||
                 MiniTickerResponse.TryHandle(response, Streams.MiniTickerSubject) ||
-                AllMarketMiniTickerResponse.TryHandle(response, Streams.AllMarketMiniTickerSubject);
-
+                AllMarketMiniTickerResponse.TryHandle(response, Streams.AllMarketMiniTickerSubject) ||
+                LogUnhandled(msg);
+        }
+        
+        private bool LogUnhandled(string message)
+        {
+            Logger.LogDebug("Received unhandled message: {message}", message);
+            return true;
         }
     }
 }

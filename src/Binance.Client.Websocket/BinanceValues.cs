@@ -8,10 +8,20 @@ namespace Binance.Client.Websocket
     public static class BinanceValues
     {
         /// <summary>
-        /// Main Binance url to websocket API
+        /// Market data websocket API url
         /// </summary>
         public static readonly Uri ApiWebsocketUrl = new Uri("wss://stream.binance.com:9443");
         
+        /// <summary>
+        /// Futures data websocket API url
+        /// </summary>
         public static readonly Uri FuturesApiWebsocketUrl = new Uri("wss://fstream.binance.com");
+
+        /// <summary>
+        /// User data websocket API rul
+        /// </summary>
+        /// <param name="listenKey">Create user's listen key via separate API</param>
+        public static Uri UserWebsocketUrl(string listenKey) =>
+            new Uri($"wss://stream.binance.com:9443/ws/{listenKey}");
     }
 }

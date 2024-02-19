@@ -53,17 +53,24 @@ More usage examples:
 
 ### API coverage
 
-| PUBLIC                 |    Covered     |  
-|------------------------|:--------------:|
-| Aggregate trades       |  ✔            |
-| Trades                 |  ✔            |
-| Kline/Candlesticks     |                |
-| Individual mini tickers|                |
-| All mini tickers       |                |
-| Individual tickers     |                |
-| All tickers            |                |
-| Partial orderbook      |  ✔            |
-| Diff. orderbook        |  ✔            |
+| PUBLIC                  | Covered |  
+|-------------------------|:-------:|
+| Aggregate trades        |    ✔    |
+| Trades                  |    ✔    |
+| Kline/Candlesticks      |         |
+| Individual mini tickers |         |
+| All mini tickers        |         |
+| Individual tickers      |         |
+| All tickers             |         |
+| Partial orderbook       |    ✔    |
+| Diff. orderbook         |    ✔    |
+
+
+| PRIVATE                 |  Covered   |  
+|-------------------------|:----------:|
+| Account update          |            |
+| Balance update          |            |
+| Order update            |     ✔      |
 
 **Pull Requests are welcome!**
 

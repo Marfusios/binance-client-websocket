@@ -8,6 +8,7 @@ using Binance.Client.Websocket.Responses.BookTickers;
 using Binance.Client.Websocket.Responses.Kline;
 using Binance.Client.Websocket.Responses.MarkPrice;
 using Binance.Client.Websocket.Responses.MiniTicker;
+using Binance.Client.Websocket.Responses.Orders;
 using Binance.Client.Websocket.Responses.Trades;
 
 namespace Binance.Client.Websocket.Client
@@ -36,6 +37,7 @@ namespace Binance.Client.Websocket.Client
         internal readonly Subject<MiniTickerResponse> MiniTickerSubject = new Subject<MiniTickerResponse>();
         internal readonly Subject<AllMarketMiniTickerResponse> AllMarketMiniTickerSubject = new Subject<AllMarketMiniTickerResponse>();
 
+        internal readonly Subject<OrderUpdate> OrderUpdateSubject = new Subject<OrderUpdate>();
 
         // PUBLIC
 
@@ -83,11 +85,19 @@ namespace Binance.Client.Websocket.Client
         /// Mini-ticker specified symbol statistics for the previous 24hrs
         /// </summary>
         public IObservable<MiniTickerResponse> MiniTickerStream => MiniTickerSubject.AsObservable();
+        
         /// <summary>
         /// Mini-ticker all symbol statistics for the previous 24hrs
         /// </summary>
         public IObservable<AllMarketMiniTickerResponse> AllMarketMiniTickerStream => AllMarketMiniTickerSubject.AsObservable();
+        
+        
+        // PRIVATE
 
-
+        /// <summary>
+        /// Order update stream - emits every update to the private order,
+        /// you need to be subscribed to authenticated API
+        /// </summary>
+        public IObservable<OrderUpdate> OrderUpdateStream => OrderUpdateSubject.AsObservable();
     }
 }
