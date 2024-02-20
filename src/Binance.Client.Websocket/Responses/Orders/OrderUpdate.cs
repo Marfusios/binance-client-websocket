@@ -73,19 +73,19 @@ namespace Binance.Client.Websocket.Responses.Orders
         /// The quantity of the order
         /// </summary>
         [JsonProperty("q")]
-        public decimal Quantity { get; set; }
+        public double Quantity { get; set; }
         
         /// <summary>
         /// The price of the order
         /// </summary>
         [JsonProperty("p")]
-        public decimal Price { get; set; }
+        public double Price { get; set; }
         
         /// <summary>
         /// The stop price of the order
         /// </summary>
         [JsonProperty("P")]
-        public decimal StopPrice { get; set; }
+        public double StopPrice { get; set; }
         
         /// <summary>
         /// The trailing delta of the order
@@ -103,7 +103,7 @@ namespace Binance.Client.Websocket.Responses.Orders
         /// The iceberg quantity of the order
         /// </summary>
         [JsonProperty("F")]
-        public decimal IcebergQuantity { get; set; }
+        public double IcebergQuantity { get; set; }
         
         /// <summary>
         /// The original client order id
@@ -133,25 +133,25 @@ namespace Binance.Client.Websocket.Responses.Orders
         /// The quantity of the last filled trade of this order
         /// </summary>
         [JsonProperty("l")]
-        public decimal LastQuantityFilled { get; set; }
+        public double LastQuantityFilled { get; set; }
         
         /// <summary>
         /// The quantity of all trades that were filled for this order
         /// </summary>
         [JsonProperty("z")]
-        public decimal QuantityFilled { get; set; }
+        public double QuantityFilled { get; set; }
         
         /// <summary>
         /// The price of the last filled trade
         /// </summary>
         [JsonProperty("L")]
-        public decimal LastPriceFilled { get; set; }
+        public double LastPriceFilled { get; set; }
         
         /// <summary>
         /// The fee payed
         /// </summary>
         [JsonProperty("n")]
-        public decimal Fee { get; set; }
+        public double Fee { get; set; }
         
         /// <summary>
         /// The asset the fee was taken from
@@ -193,19 +193,19 @@ namespace Binance.Client.Websocket.Responses.Orders
         /// Cummulative quantity
         /// </summary>
         [JsonProperty("Z")]
-        public decimal QuoteQuantityFilled { get; set; }
+        public double QuoteQuantityFilled { get; set; }
         
         /// <summary>
         /// Quote order quantity
         /// </summary>
         [JsonProperty("Q")]
-        public decimal QuoteQuantity { get; set; }
+        public double QuoteQuantity { get; set; }
         
         /// <summary>
         /// Last quote asset transacted quantity (i.e. LastPrice * LastQuantity)
         /// </summary>
         [JsonProperty("Y")]
-        public decimal LastQuoteQuantity { get; set; }
+        public double LastQuoteQuantity { get; set; }
         
         /// <summary>
         /// This id of the corresponding order list. (-1 if not part of an order list)
@@ -253,13 +253,13 @@ namespace Binance.Client.Websocket.Responses.Orders
         /// Prevented quantity
         /// </summary>
         [JsonProperty("A")]
-        public decimal? PreventedQuantity { get; set; }
+        public double? PreventedQuantity { get; set; }
         
         /// <summary>
         /// Last prevented quantiy
         /// </summary>
         [JsonProperty("B")]
-        public decimal? LastPreventedQuantity { get; set; }
+        public double? LastPreventedQuantity { get; set; }
         
         /// <summary>
         /// Prevented match id
