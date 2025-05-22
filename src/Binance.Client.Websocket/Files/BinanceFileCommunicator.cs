@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.IO;
 using System.Net.WebSockets;
 using System.Reactive.Linq;
@@ -29,6 +30,7 @@ namespace Binance.Client.Websocket.Files
         public bool IsRunning { get; private set; }
         public bool IsReconnectionEnabled { get; set; }
         public ClientWebSocket NativeClient { get; }
+        public bool IsStreamDisposedAutomatically { get; set; }
         public Encoding MessageEncoding { get; set; }
 
         public bool IsTextMessageConversionEnabled { get; set; }
@@ -38,6 +40,11 @@ namespace Binance.Client.Websocket.Files
         public Encoding Encoding { get; set; } = Encoding.UTF8;
 
         public Uri Url { get; set; }
+
+        public bool SendAsText(ReadOnlySequence<byte> message)
+        {
+            return true;
+        }
 
         public void StreamFakeMessage(ResponseMessage message)
         {
@@ -82,6 +89,11 @@ namespace Binance.Client.Websocket.Files
         }
 
         public bool Send(ArraySegment<byte> message)
+        {
+            return true;
+        }
+
+        public bool Send(ReadOnlySequence<byte> message)
         {
             return true;
         }

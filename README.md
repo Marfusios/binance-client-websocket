@@ -1,5 +1,10 @@
 ﻿![Logo](binance-logo-alt.png)
-# Binance websocket API client [![Build Status](https://travis-ci.org/Marfusios/binance-client-websocket.svg?branch=master)](https://travis-ci.org/Marfusios/binance-client-websocket) [![NuGet version](https://badge.fury.io/nu/Binance.Client.Websocket.svg)](https://badge.fury.io/nu/Binance.Client.Websocket)
+# Binance websocket API client 
+
+[![NuGet version](https://img.shields.io/nuget/v/Binance.Client.Websocket?style=flat-square)](https://www.nuget.org/packages/Binance.Client.Websocket)
+[![Nuget downloads](https://img.shields.io/nuget/dt/Binance.Client.Websocket?style=flat-square)](https://www.nuget.org/packages/Binance.Client.Websocket)
+[![CI build](https://img.shields.io/github/check-runs/marfusios/binance-client-websocket/master?style=flat-square&label=build)](https://github.com/Marfusios/binance-client-websocket/actions/workflows/dotnet-core.yml)
+
 
 This is a C# implementation of the Binance websocket API found here:
 
