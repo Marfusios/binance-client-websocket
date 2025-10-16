@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace Binance.Client.Websocket.Responses.Orders
 {
     /// <summary>
@@ -29,6 +31,12 @@ namespace Binance.Client.Websocket.Responses.Orders
         /// Trade
         /// </summary>
         Trade,
+        
+        /// <summary>
+        /// Calculated liquidation execution
+        /// </summary>
+        [JsonProperty("CALCULATED")]
+        Calculated,
         
         /// <summary>
         /// Expired

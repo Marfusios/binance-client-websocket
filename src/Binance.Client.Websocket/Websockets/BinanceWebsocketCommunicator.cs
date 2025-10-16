@@ -36,11 +36,18 @@ namespace Binance.Client.Websocket.Websockets
             _logger = logger;
         }
 
+        public BinanceUserStreamType StreamType => Url.Host.Contains("fstream") ? BinanceUserStreamType.Futures : BinanceUserStreamType.Spot;
+        
         public async Task Authenticate(string apiKey, IBinanceSignatureService signature)
         {
             // TODO: use IHttpClientFactory
             var http = new HttpClient();
-            _userApi = new BinanceUserRestApi(apiKey: apiKey, signatureService: signature, httpClient: http);
+            var baseUrl = StreamType switch
+            {
+                BinanceUserStreamType.Futures => BinanceValues.FuturesRestApiBaseUrl,
+                _ => BinanceValues.SpotRestApiBaseUrl
+            };
+            _userApi = new BinanceUserRestApi(httpClient: http, signatureService: signature, baseUrl: baseUrl, apiKey: apiKey);
 
             await AuthenticateUrl();
 
@@ -59,7 +66,7 @@ namespace Binance.Client.Websocket.Websockets
                     if (_userApi == null || string.IsNullOrWhiteSpace(_listenKey))
                         return;
                     _logger.LogInformation("Refreshing listen key to keep it alive");
-                    _ = _userApi.PingSpotListenKey(_listenKey);
+                    _ = PingListenKey();
                 });
         }
 
@@ -77,14 +84,56 @@ namespace Binance.Client.Websocket.Websockets
                 return;
             
             _logger.LogInformation("Getting a new listen key for authenticated websocket connection");
-            var response = await _userApi.CreateSpotListenKey();
-            _listenKey = response.ListenKey;
-            if (string.IsNullOrWhiteSpace(_listenKey))
-                throw new BinanceException("Listen key is empty, cannot authenticate websocket connection");
+            switch (StreamType)
+            {
+                case BinanceUserStreamType.Futures:
+                {
+                    var response = await _userApi.CreateFuturesListenKey();
+                    _listenKey = response.ListenKey;
+                    if (string.IsNullOrWhiteSpace(_listenKey))
+                        throw new BinanceException("Listen key is empty, cannot authenticate websocket connection");
+
+                    var newUrl = BinanceValues.UserFuturesWebsocketUrl(_listenKey);
+                    Url = newUrl;
+                    break;
+                }
+                default:
+                {
+                    var response = await _userApi.CreateSpotListenKey();
+                    _listenKey = response.ListenKey;
+                    if (string.IsNullOrWhiteSpace(_listenKey))
+                        throw new BinanceException("Listen key is empty, cannot authenticate websocket connection");
+
+                    var newUrl = BinanceValues.UserWebsocketUrl(_listenKey);
+                    Url = newUrl;
+                    break;
+                }
+            }
             
-            var newUrl = BinanceValues.UserWebsocketUrl(_listenKey);
-            Url = newUrl;
             _logger.LogInformation("The new listen key was obtained, changing websocket url to {url}", Url);
+        }
+        
+        private async Task PingListenKey()
+        {
+            if (_userApi == null || string.IsNullOrWhiteSpace(_listenKey))
+                return;
+
+            try
+            {
+                switch (StreamType)
+                {
+                    case BinanceUserStreamType.Futures:
+                        await _userApi.PingFuturesListenKey(_listenKey);
+                        break;
+                    default:
+                        await _userApi.PingSpotListenKey(_listenKey);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to refresh listen key");
+            }
         }
     }
 }

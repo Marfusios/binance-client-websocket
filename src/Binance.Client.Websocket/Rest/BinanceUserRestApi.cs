@@ -24,6 +24,7 @@ namespace Binance.Client.Websocket.Rest
         }
 
         private const string CREATE_SPOT_LISTEN_KEY = "/api/v3/userDataStream";
+        private const string CREATE_FUTURES_LISTEN_KEY = "/fapi/v1/listenKey";
 
         /// <summary>
         /// Start a new user data stream.<para />
@@ -41,6 +42,7 @@ namespace Binance.Client.Websocket.Rest
         }
 
         private const string PING_SPOT_LISTEN_KEY = "/api/v3/userDataStream";
+        private const string PING_FUTURES_LISTEN_KEY = "/fapi/v1/listenKey";
 
         /// <summary>
         /// Keepalive a user data stream to prevent a time out. User data streams will close after 60 minutes. It's recommended to send a ping about every 30 minutes.<para />
@@ -62,6 +64,7 @@ namespace Binance.Client.Websocket.Rest
         }
 
         private const string CLOSE_SPOT_LISTEN_KEY = "/api/v3/userDataStream";
+        private const string CLOSE_FUTURES_LISTEN_KEY = "/fapi/v1/listenKey";
 
         /// <summary>
         /// Close out a user data stream.<para />
@@ -73,6 +76,59 @@ namespace Binance.Client.Websocket.Rest
         {
             var result = await SendPublicAsync<string>(
                 CLOSE_SPOT_LISTEN_KEY,
+                HttpMethod.Delete,
+                query: new Dictionary<string, object>
+                {
+                { "listenKey", listenKey },
+            });
+
+            return result;
+        }
+        
+        /// <summary>
+        /// Start a new futures user data stream.<para />
+        /// The stream will close after 60 minutes unless a keepalive is sent. If the account has an active `listenKey`, that `listenKey` will be returned and its validity will be extended for 60 minutes.<para />
+        /// Weight: 1.
+        /// </summary>
+        /// <returns>Listen key.</returns>
+        public async Task<BinanceListenKeyResponse> CreateFuturesListenKey()
+        {
+            var result = await SendPublicAsync<BinanceListenKeyResponse>(
+                CREATE_FUTURES_LISTEN_KEY,
+                HttpMethod.Post);
+
+            return result;
+        }
+        
+        /// <summary>
+        /// Keepalive a futures user data stream to prevent a time out. User data streams will close after 60 minutes. It's recommended to send a ping about every 30 minutes.<para />
+        /// Weight: 1.
+        /// </summary>
+        /// <param name="listenKey">User websocket listen key.</param>
+        /// <returns>OK.</returns>
+        public async Task<string> PingFuturesListenKey(string listenKey)
+        {
+            var result = await SendPublicAsync<string>(
+                PING_FUTURES_LISTEN_KEY,
+                HttpMethod.Put,
+                query: new Dictionary<string, object>
+                {
+                    { "listenKey", listenKey },
+                });
+
+            return result;
+        }
+        
+        /// <summary>
+        /// Close out a futures user data stream.<para />
+        /// Weight: 1.
+        /// </summary>
+        /// <param name="listenKey">User websocket listen key.</param>
+        /// <returns>OK.</returns>
+        public async Task<string> CloseFuturesListenKey(string listenKey)
+        {
+            var result = await SendPublicAsync<string>(
+                CLOSE_FUTURES_LISTEN_KEY,
                 HttpMethod.Delete,
                 query: new Dictionary<string, object>
                 {

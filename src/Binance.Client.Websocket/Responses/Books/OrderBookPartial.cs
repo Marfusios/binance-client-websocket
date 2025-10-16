@@ -30,5 +30,14 @@ namespace Binance.Client.Websocket.Responses.Books
         /// </summary>
         [JsonProperty("asks")]
         public OrderBookLevel[]? Asks { get; set; }
+
+        [JsonProperty("pu")]
+        private long LastUpdateIdAlt { set => LastUpdateId = value; }
+        
+        [JsonProperty("b")]
+        private OrderBookLevel[]? BidsAlt { set => Bids = value; }
+        
+        [JsonProperty("a")]
+        private OrderBookLevel[]? AsksAlt { set => Asks = value; }
     }
 }

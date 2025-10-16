@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 namespace Binance.Client.Websocket.Responses.Orders
 {
     /// <summary>
-    /// Order type for a spot order
+    /// Order type for an order
     /// </summary>
     public enum OrderType
     {
@@ -47,6 +47,36 @@ namespace Binance.Client.Websocket.Responses.Orders
         /// Same as a limit order, however it will fail if the order would immediately match, therefor preventing taker orders
         /// </summary>
         [JsonProperty("LIMIT_MAKER")]
-        LimitMaker
+        LimitMaker,
+        
+        /// <summary>
+        /// Stop order
+        /// </summary>
+        [JsonProperty("STOP")]
+        Stop,
+        
+        /// <summary>
+        /// Stop market order
+        /// </summary>
+        [JsonProperty("STOP_MARKET")]
+        StopMarket,
+        
+        /// <summary>
+        /// Take profit market order
+        /// </summary>
+        [JsonProperty("TAKE_PROFIT_MARKET")]
+        TakeProfitMarket,
+        
+        /// <summary>
+        /// Trailing stop market order
+        /// </summary>
+        [JsonProperty("TRAILING_STOP_MARKET")]
+        TrailingStopMarket,
+        
+        /// <summary>
+        /// Liquidation order
+        /// </summary>
+        [JsonProperty("LIQUIDATION")]
+        Liquidation
     }
 }

@@ -38,6 +38,7 @@ namespace Binance.Client.Websocket.Client
         internal readonly Subject<AllMarketMiniTickerResponse> AllMarketMiniTickerSubject = new Subject<AllMarketMiniTickerResponse>();
 
         internal readonly Subject<OrderUpdate> OrderUpdateSubject = new Subject<OrderUpdate>();
+        internal readonly Subject<FuturesOrderUpdate> FuturesOrderUpdateSubject = new Subject<FuturesOrderUpdate>();
 
         // PUBLIC
 
@@ -99,5 +100,11 @@ namespace Binance.Client.Websocket.Client
         /// you need to be subscribed to authenticated API
         /// </summary>
         public IObservable<OrderUpdate> OrderUpdateStream => OrderUpdateSubject.AsObservable();
+        
+        /// <summary>
+        /// Futures order update stream - emits every update to the futures private order,
+        /// you need to be subscribed to futures authenticated API
+        /// </summary>
+        public IObservable<FuturesOrderUpdate> FuturesOrderUpdateStream => FuturesOrderUpdateSubject.AsObservable();
     }
 }

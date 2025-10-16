@@ -174,6 +174,7 @@ namespace Binance.Client.Websocket.Client
                 AggregatedTradeResponse.TryHandle(response, Streams.TradeBinSubject) ||
                 OrderBookPartialResponse.TryHandle(response, Streams.OrderBookPartialSubject) ||
                 OrderBookDiffResponse.TryHandle(response, Streams.OrderBookDiffSubject) ||
+                FuturesOrderUpdate.TryHandle(response, Streams.FuturesOrderUpdateSubject) ||
                 OrderUpdate.TryHandle(response, Streams.OrderUpdateSubject) ||
                 FundingResponse.TryHandle(response, Streams.FundingSubject) ||
                 BookTickerResponse.TryHandle(response, Streams.BookTickerSubject) ||
