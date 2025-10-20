@@ -78,7 +78,7 @@ namespace Binance.Client.Websocket.Websockets
             base.Dispose();
         }
 
-        private async Task AuthenticateUrl()
+        public async Task AuthenticateUrl()
         {
             if (_userApi == null)
                 return;
