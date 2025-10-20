@@ -211,6 +211,13 @@ namespace Binance.Client.Websocket.Sample
                                 "Status: {status}, execution: {executionType}", 
                     order.Type, order.Side, order.Quantity, order.Price, order.QuantityFilled, order.Status, order.ExecutionType);
             });
+
+            client.Streams.ListenKeyExpiredStream.Subscribe(expired =>
+            {
+                Log.Warning("Listen key expired! Key: {listenKey}. Event time: {eventTime}. " +
+                           "Connection will need to be re-established with a new listen key.",
+                    expired.ListenKey, expired.EventTime);
+            });
         }
 
         private static SerilogLoggerFactory InitLogging()

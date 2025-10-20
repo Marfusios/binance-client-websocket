@@ -40,6 +40,8 @@ namespace Binance.Client.Websocket.Client
         internal readonly Subject<OrderUpdate> OrderUpdateSubject = new Subject<OrderUpdate>();
         internal readonly Subject<FuturesOrderUpdate> FuturesOrderUpdateSubject = new Subject<FuturesOrderUpdate>();
 
+        internal readonly Subject<ListenKeyExpiredResponse> ListenKeyExpiredSubject = new Subject<ListenKeyExpiredResponse>();
+
         // PUBLIC
 
         /// <summary>
@@ -106,5 +108,12 @@ namespace Binance.Client.Websocket.Client
         /// you need to be subscribed to futures authenticated API
         /// </summary>
         public IObservable<FuturesOrderUpdate> FuturesOrderUpdateStream => FuturesOrderUpdateSubject.AsObservable();
+
+        /// <summary>
+        /// Listen key expired stream - emits when the listenKey used for the user data stream expires.
+        /// No more user data events will be updated after this event is received until a new valid listenKey is used.
+        /// You need to be subscribed to authenticated API.
+        /// </summary>
+        public IObservable<ListenKeyExpiredResponse> ListenKeyExpiredStream => ListenKeyExpiredSubject.AsObservable();
     }
 }
