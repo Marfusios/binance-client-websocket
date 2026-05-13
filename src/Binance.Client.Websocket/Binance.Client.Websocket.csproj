@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;net6;net7;net8</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
 		<PackageId>Binance.Client.Websocket</PackageId>
 		<Authors>Mariusz Kotas</Authors>
 		<Description>Client for Binance websocket API</Description>
@@ -27,8 +27,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-		<PackageReference Include="System.Reactive" Version="6.0.2" />
-		<PackageReference Include="Websocket.Client" Version="5.3.0" />
+		<PackageReference Include="System.Reactive" Version="6.1.0" />
+		<PackageReference Include="Websocket.Client" Version="5.4.0" />
 	</ItemGroup>
 
 	<ItemGroup>

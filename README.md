@@ -1,4 +1,4 @@
-﻿![Logo](binance-logo-alt.png)
+![Logo](binance-logo-alt.png)
 # Binance websocket API client 
 
 [![NuGet version](https://img.shields.io/nuget/v/Binance.Client.Websocket?style=flat-square)](https://www.nuget.org/packages/Binance.Client.Websocket)
@@ -19,7 +19,8 @@ https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-so
 
 * installation via NuGet ([Binance.Client.Websocket](https://www.nuget.org/packages/Binance.Client.Websocket))
 * public and authenticated API
-* targeting .NET Standard 2.0 (.NET Core, Linux/MacOS compatible)
+* targets `netstandard2.1`, `net6.0`, `net7.0`, `net8.0`, `net9.0`, `net10.0`
+* built on [Websocket.Client 5.4.0](https://www.nuget.org/packages/Websocket.Client/5.4.0) for websocket transport, reconnects, and lower-allocation message handling
 * reactive extensions ([Rx.NET](https://github.com/Reactive-Extensions/Rx.NET))
 * integrated logging abstraction ([LibLog](https://github.com/damianh/LibLog))
 
