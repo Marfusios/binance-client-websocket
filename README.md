@@ -19,8 +19,8 @@ https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-so
 
 * installation via NuGet ([Binance.Client.Websocket](https://www.nuget.org/packages/Binance.Client.Websocket))
 * public and authenticated API
-* targets `netstandard2.1`, `net6.0`, `net7.0`, `net8.0`, `net9.0`, `net10.0`
-* built on [Websocket.Client 5.4.0](https://www.nuget.org/packages/Websocket.Client/5.4.0) for websocket transport, reconnects, and lower-allocation message handling
+* targets `netstandard2.0`, `netstandard2.1`, `net6.0`, `net7.0`, `net8.0`, `net9.0`, `net10.0`
+* built on [Websocket.Client 5.5.0](https://www.nuget.org/packages/Websocket.Client/5.5.0) for websocket transport, reconnects, and lower-allocation message handling
 * reactive extensions ([Rx.NET](https://github.com/Reactive-Extensions/Rx.NET))
 * integrated logging abstraction ([LibLog](https://github.com/damianh/LibLog))
 
@@ -116,9 +116,9 @@ More usage examples:
 
 ### Reconnecting
 
-There is a built-in reconnection which invokes after 1 minute (default) of not receiving any messages from the server. It is possible to configure that timeout via `communicator.ReconnectTimeoutMs`. Also, there is a stream `ReconnectionHappened` which sends information about a type of reconnection. However, if you are subscribed to low rate channels, it is very likely that you will encounter that timeout - higher the timeout to a few minutes or call `PingRequest` by your own every few seconds. 
+There is a built-in reconnection which invokes after 1 minute (default) of not receiving any messages from the server. It is possible to configure that timeout via `communicator.ReconnectTimeout`. Also, there is a stream `ReconnectionHappened` which sends information about a type of reconnection. However, if you are subscribed to low rate channels, it is very likely that you will encounter that timeout - higher the timeout to a few minutes or call `PingRequest` by your own every few seconds. 
 
-In the case of Binance outage, there is a built-in functionality which slows down reconnection requests (could be configured via `communicator.ErrorReconnectTimeoutMs`, the default is 1 minute).
+In the case of Binance outage, there is a built-in functionality which slows down reconnection requests (could be configured via `communicator.ErrorReconnectTimeout`, the default is 1 minute).
 
 ### Backtesting
 

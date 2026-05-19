@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Binance.Client.Websocket.Client;
 using Binance.Client.Websocket.Communicator;
-using Binance.Client.Websocket.Responses;
 using Binance.Client.Websocket.Responses.Books;
 using Binance.Client.Websocket.Responses.Trades;
 using Binance.Client.Websocket.Sample.WinForms.Statistics;
@@ -25,9 +24,6 @@ namespace Binance.Client.Websocket.Sample.WinForms.Presenters
 
         private IBinanceCommunicator _communicator;
         private BinanceWebsocketClient _client;
-
-        private IDisposable _pingSubscription;
-        private DateTime _pingRequest;
 
         private readonly string _defaultPair = "btcusdt";
         private readonly string _currency = "$";
@@ -67,32 +63,30 @@ namespace Binance.Client.Websocket.Sample.WinForms.Presenters
 
             Subscribe(_client);
 
-            _communicator.ReconnectionHappened.Subscribe(type =>
+            _communicator.ReconnectionHappened.Subscribe(info =>
             {
-                _view.Status($"Reconnected (type: {type})", StatusType.Info);
+                _view.Status($"Reconnected (type: {info.Type})", StatusType.Info);
             });
 
-            _communicator.DisconnectionHappened.Subscribe(type =>
+            _communicator.DisconnectionHappened.Subscribe(info =>
             {
-                if (type == DisconnectionType.Error)
+                if (info.Type == DisconnectionType.Error)
                 {
-                    _view.Status($"Disconnected by error, next try in {_communicator.ErrorReconnectTimeoutMs/1000} sec", 
+                    _view.Status($"Disconnected by error, next try in {_communicator.ErrorReconnectTimeout?.TotalSeconds} sec", 
                         StatusType.Error);
                     return;
                 }
-                _view.Status($"Disconnected (type: {type})", 
+                _view.Status($"Disconnected (type: {info.Type})", 
                     StatusType.Warning);
             });
 
             SetSubscriptions(_client, pair);
             await _communicator.Start();
 
-            StartPingCheck(_client);
         }
 
         private void OnStop()
         {
-            _pingSubscription?.Dispose();
             _client.Dispose();
             _communicator.Dispose();
             _client = null;
@@ -104,7 +98,6 @@ namespace Binance.Client.Websocket.Sample.WinForms.Presenters
         {
             client.Streams.TradesStream.ObserveOn(TaskPoolScheduler.Default).Subscribe(HandleTrades);
             client.Streams.OrderBookPartialStream.ObserveOn(TaskPoolScheduler.Default).Subscribe(HandleOrderBook);
-            client.Streams.PongStream.ObserveOn(TaskPoolScheduler.Default).Subscribe(HandlePong);
         }
 
         private void SetSubscriptions(BinanceWebsocketClient client, string pair)
@@ -160,30 +153,6 @@ namespace Binance.Client.Websocket.Sample.WinForms.Presenters
         {
             var millions = amount / 1000000;
             return $"{_currency}{millions:#.00} M";
-        }
-
-        private void StartPingCheck(BinanceWebsocketClient client)
-        {
-            //_pingSubscription = Observable
-            //    .Interval(TimeSpan.FromSeconds(5))
-            //    .Subscribe(async x =>
-            //    {
-            //        _pingRequest = DateTime.UtcNow;
-            //        await client.Send(new PingRequest());
-            //    });      
-        }
-
-        private void HandlePong(PongResponse pong)
-        {
-            var current = DateTime.UtcNow;
-            ComputePing(current, _pingRequest);
-        }
-
-        private void ComputePing(DateTime current, DateTime before)
-        {
-            var diff = current.Subtract(before);
-            _view.Ping = $"{diff.TotalMilliseconds:###} ms";
-            _view.Status("Connected", StatusType.Info);
         }
 
         private void Clear()

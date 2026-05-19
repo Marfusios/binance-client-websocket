@@ -11,7 +11,7 @@
         /// <param name="symbol"></param>
         protected SimpleSubscriptionBase(string symbol)
         {
-            Symbol = (symbol ?? string.Empty).ToLower();
+            Symbol = (symbol ?? string.Empty).ToLowerInvariant();
         }
         /// <summary>
         /// Create simple subscription for provided symbol

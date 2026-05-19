@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,6 +13,8 @@ namespace Binance.Client.Websocket.Json
     /// </summary>
     public class ArrayConverter : JsonConverter
     {
+        private static readonly ConcurrentDictionary<Type, ArrayPropertyInfo[]> CachedProperties = new ConcurrentDictionary<Type, ArrayPropertyInfo[]>();
+
         public override bool CanConvert(Type objectType)
         {
             return true;
@@ -27,29 +29,25 @@ namespace Binance.Client.Websocket.Json
 
         private static object ParseObject(JArray arr, object result, Type objectType)
         {
-            foreach (var property in objectType.GetProperties())
+            foreach (var propertyInfo in GetArrayProperties(objectType))
             {
-                var attribute =
-                    (ArrayPropertyAttribute)property.GetCustomAttribute(typeof(ArrayPropertyAttribute));
-                if (attribute == null)
+                if (propertyInfo.Index >= arr.Count)
                     continue;
 
-                if (attribute.Index >= arr.Count)
-                    continue;
-
-                if(property.PropertyType.BaseType == typeof(Array))
+                var property = propertyInfo.Property;
+                if (propertyInfo.IsArray)
                 {
-                    var objType = property.PropertyType.GetElementType();
-                    var innerArray = (JArray)arr[attribute.Index];
+                    var objType = propertyInfo.ElementType ?? throw new JsonSerializationException($"Array property '{property.Name}' has no element type.");
+                    var innerArray = (JArray)arr[propertyInfo.Index];
                     var count = 0;
                     if (innerArray.Count == 0)
                     {
-                        var arrayResult = (IList)Activator.CreateInstance(property.PropertyType, new [] { 0 });
+                        var arrayResult = (IList)Activator.CreateInstance(propertyInfo.PropertyType, new [] { 0 });
                         property.SetValue(result, arrayResult);
                     }
                     else if (innerArray[0].Type == JTokenType.Array)
                     {
-                        var arrayResult = (IList)Activator.CreateInstance(property.PropertyType, new [] { innerArray.Count });
+                        var arrayResult = (IList)Activator.CreateInstance(propertyInfo.PropertyType, new [] { innerArray.Count });
                         foreach (var obj in innerArray)
                         {
                             var innerObj = Activator.CreateInstance(objType);
@@ -60,7 +58,7 @@ namespace Binance.Client.Websocket.Json
                     }
                     else
                     {
-                        var arrayResult = (IList)Activator.CreateInstance(property.PropertyType, new [] { 1 });
+                        var arrayResult = (IList)Activator.CreateInstance(propertyInfo.PropertyType, new [] { 1 });
                         var innerObj = Activator.CreateInstance(objType);
                         arrayResult[0] = ParseObject(innerArray, innerObj, objType);
                         property.SetValue(result, arrayResult);
@@ -68,10 +66,11 @@ namespace Binance.Client.Websocket.Json
                     continue;
                 }
 
-                var converterAttribute = (JsonConverterAttribute)property.GetCustomAttribute(typeof(JsonConverterAttribute)) ?? (JsonConverterAttribute)property.PropertyType.GetCustomAttribute(typeof(JsonConverterAttribute));
-                var value = converterAttribute != null ? arr[attribute.Index].ToObject(property.PropertyType, new JsonSerializer { Converters = { (JsonConverter)Activator.CreateInstance(converterAttribute.ConverterType) } }) : arr[attribute.Index];
+                var value = propertyInfo.ConverterSerializer != null
+                    ? arr[propertyInfo.Index].ToObject(propertyInfo.PropertyType, propertyInfo.ConverterSerializer)
+                    : arr[propertyInfo.Index];
 
-                if (value != null && property.PropertyType.IsInstanceOfType(value))
+                if (value != null && propertyInfo.PropertyType.IsInstanceOfType(value))
                     property.SetValue(result, value);
                 else
                 {
@@ -79,16 +78,18 @@ namespace Binance.Client.Websocket.Json
                         if (token.Type == JTokenType.Null)
                             value = null;
 
-                    if ((property.PropertyType == typeof(decimal)
-                     || property.PropertyType == typeof(decimal?))
-                     && (value != null && value.ToString().Contains("e")))
+                    var stringValue = value?.ToString();
+                    if ((propertyInfo.PropertyType == typeof(decimal)
+                     || propertyInfo.PropertyType == typeof(decimal?))
+                     && stringValue != null
+                     && (stringValue.IndexOf('e') >= 0 || stringValue.IndexOf('E') >= 0))
                     {
-                        if (decimal.TryParse(value.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var dec))
+                        if (decimal.TryParse(stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var dec))
                             property.SetValue(result, dec);
                     }
                     else
                     {
-                        property.SetValue(result, value == null ? null : Convert.ChangeType(value, property.PropertyType));
+                        property.SetValue(result, value == null ? null : Convert.ChangeType(value, propertyInfo.PropertyType));
                     }
                 }
             }
@@ -98,35 +99,57 @@ namespace Binance.Client.Websocket.Json
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             writer.WriteStartArray();
-            var props = value.GetType().GetProperties();
-            var ordered = props.OrderBy(p => p.GetCustomAttribute<ArrayPropertyAttribute>()?.Index);
 
             var last = -1;
-            foreach (var prop in ordered)
+            foreach (var propertyInfo in GetArrayProperties(value.GetType()))
             {
-                var arrayProp = prop.GetCustomAttribute<ArrayPropertyAttribute>();
-                if (arrayProp == null)
+                if (propertyInfo.Index == last)
                     continue;
 
-                if (arrayProp.Index == last)
-                    continue;
-
-                while (arrayProp.Index != last + 1)
+                while (propertyInfo.Index != last + 1)
                 {
                     writer.WriteValue((string)null);
                     last += 1;
                 }
 
-                last = arrayProp.Index;
-                var converterAttribute = (JsonConverterAttribute)prop.GetCustomAttribute(typeof(JsonConverterAttribute));
-                if (converterAttribute != null)
-                    writer.WriteRawValue(JsonConvert.SerializeObject(prop.GetValue(value), (JsonConverter)Activator.CreateInstance(converterAttribute.ConverterType)));
-                else if (!IsSimple(prop.PropertyType))
-                    serializer.Serialize(writer, prop.GetValue(value));
+                last = propertyInfo.Index;
+                if (propertyInfo.Converter != null)
+                    writer.WriteRawValue(JsonConvert.SerializeObject(propertyInfo.Property.GetValue(value), propertyInfo.Converter));
+                else if (!propertyInfo.IsSimple)
+                    serializer.Serialize(writer, propertyInfo.Property.GetValue(value));
                 else
-                    writer.WriteValue(prop.GetValue(value));
+                    writer.WriteValue(propertyInfo.Property.GetValue(value));
             }
             writer.WriteEndArray();
+        }
+
+        private static ArrayPropertyInfo[] GetArrayProperties(Type type)
+        {
+            return CachedProperties.GetOrAdd(type, CreateArrayProperties);
+        }
+
+        private static ArrayPropertyInfo[] CreateArrayProperties(Type type)
+        {
+            var properties = type.GetProperties();
+            var result = new ArrayList(properties.Length);
+
+            foreach (var property in properties)
+            {
+                var attribute = (ArrayPropertyAttribute)property.GetCustomAttribute(typeof(ArrayPropertyAttribute));
+                if (attribute == null)
+                    continue;
+
+                result.Add(new ArrayPropertyInfo(property, attribute.Index));
+            }
+
+            var items = (ArrayPropertyInfo[])result.ToArray(typeof(ArrayPropertyInfo));
+            Array.Sort(items, (left, right) => left.Index.CompareTo(right.Index));
+            return items;
+        }
+
+        private static JsonConverter CreateConverter(JsonConverterAttribute attribute)
+        {
+            return (JsonConverter)Activator.CreateInstance(attribute.ConverterType, attribute.ConverterParameters);
         }
 
         private static bool IsSimple(Type type)
@@ -140,6 +163,44 @@ namespace Binance.Client.Websocket.Json
               || type.IsEnum
               || type == typeof(string)
               || type == typeof(decimal);
+        }
+
+        private sealed class ArrayPropertyInfo
+        {
+            public ArrayPropertyInfo(PropertyInfo property, int index)
+            {
+                Property = property;
+                Index = index;
+                PropertyType = property.PropertyType;
+                ElementType = PropertyType.GetElementType();
+                IsArray = PropertyType.BaseType == typeof(Array);
+                IsSimple = IsSimple(PropertyType);
+
+                var converterAttribute = (JsonConverterAttribute)property.GetCustomAttribute(typeof(JsonConverterAttribute))
+                    ?? (JsonConverterAttribute)PropertyType.GetCustomAttribute(typeof(JsonConverterAttribute));
+                if (converterAttribute != null)
+                {
+                    Converter = CreateConverter(converterAttribute);
+                    ConverterSerializer = new JsonSerializer();
+                    ConverterSerializer.Converters.Add(Converter);
+                }
+            }
+
+            public PropertyInfo Property { get; }
+
+            public int Index { get; }
+
+            public Type PropertyType { get; }
+
+            public Type? ElementType { get; }
+
+            public bool IsArray { get; }
+
+            public bool IsSimple { get; }
+
+            public JsonConverter? Converter { get; }
+
+            public JsonSerializer? ConverterSerializer { get; }
         }
     }
 

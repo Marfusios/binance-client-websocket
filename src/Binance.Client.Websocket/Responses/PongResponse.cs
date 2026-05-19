@@ -1,5 +1,7 @@
 ﻿using System.Reactive.Subjects;
 
+using System;
+
 namespace Binance.Client.Websocket.Responses
 {
     /// <summary>
@@ -17,7 +19,7 @@ namespace Binance.Client.Websocket.Responses
             if (response == null)
                 return false;
 
-            if (!response.ToLower().Contains("pong"))
+            if (response.IndexOf("pong", StringComparison.OrdinalIgnoreCase) < 0)
                 return false;
 
             var parsed = new PongResponse { Message = response };

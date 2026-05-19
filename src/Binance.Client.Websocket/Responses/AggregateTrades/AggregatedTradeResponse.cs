@@ -1,4 +1,5 @@
 ﻿using System.Reactive.Subjects;
+using System;
 using Binance.Client.Websocket.Json;
 using Newtonsoft.Json.Linq;
 
@@ -13,7 +14,7 @@ namespace Binance.Client.Websocket.Responses.AggregateTrades
         internal static bool TryHandle(JObject response, ISubject<AggregatedTradeResponse> subject)
         {
             var stream = response?["stream"]?.Value<string>();
-            if (stream == null || !stream.ToLower().EndsWith("@aggtrade"))
+            if (stream == null || !stream.EndsWith("@aggtrade", StringComparison.OrdinalIgnoreCase))
                 return false;
 
             var parsed = response!.ToObject<AggregatedTradeResponse>(BinanceJsonSerializer.Serializer);

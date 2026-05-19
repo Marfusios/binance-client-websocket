@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Binance.Client.Websocket.Communicator;
 using Binance.Client.Websocket.Exceptions;
 using Binance.Client.Websocket.Json;
@@ -69,10 +68,15 @@ namespace Binance.Client.Websocket.Client
         {
             BnbValidations.ValidateInput(baseUrl, nameof(baseUrl));
 
-            if (subscriptions == null || !subscriptions.Any())
+            if (subscriptions == null || subscriptions.Length == 0)
                 throw new BinanceBadInputException("Please provide at least one subscription");
 
-            var streams = subscriptions.Select(x => x.StreamName).ToArray();
+            var streams = new string[subscriptions.Length];
+            for (var i = 0; i < subscriptions.Length; i++)
+            {
+                streams[i] = subscriptions[i].StreamName;
+            }
+
             var urlPart = string.Join("/", streams);
             var urlPartFull = $"/stream?streams={urlPart}";
 

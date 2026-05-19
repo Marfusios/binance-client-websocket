@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System;
 using System.Reactive.Subjects;
 using Binance.Client.Websocket.Json;
 using Newtonsoft.Json.Linq;
@@ -14,17 +15,23 @@ namespace Binance.Client.Websocket.Responses.MarkPrice
             if (stream == null)
                 return false;
 
-            if (!stream.Contains("markPrice"))
+            if (stream.IndexOf("markPrice", StringComparison.Ordinal) < 0)
                 return false;
 
             var parsed = response!.ToObject<FundingResponse>(BinanceJsonSerializer.Serializer);
             if (parsed != null)
             {
-                parsed.Data.Symbol = stream.Split('@').FirstOrDefault();
+                parsed.Data.Symbol = GetSymbol(stream);
                 subject.OnNext(parsed);
             }
 
             return true;
+        }
+
+        private static string GetSymbol(string stream)
+        {
+            var separator = stream.IndexOf('@');
+            return separator >= 0 ? stream.Substring(0, separator) : stream;
         }
     }
 }

@@ -24,7 +24,25 @@ namespace Binance.Client.Websocket.Signing
 
             var hash = hmacSha256.ComputeHash(payloadBytes);
 
-            return BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
+            return ToLowerHex(hash);
+        }
+
+        private static string ToLowerHex(byte[] bytes)
+        {
+            var chars = new char[bytes.Length * 2];
+            for (var i = 0; i < bytes.Length; i++)
+            {
+                var value = bytes[i];
+                chars[i * 2] = GetLowerHexChar(value >> 4);
+                chars[i * 2 + 1] = GetLowerHexChar(value & 0xF);
+            }
+
+            return new string(chars);
+        }
+
+        private static char GetLowerHexChar(int value)
+        {
+            return (char)(value < 10 ? '0' + value : 'a' + value - 10);
         }
     }
 }

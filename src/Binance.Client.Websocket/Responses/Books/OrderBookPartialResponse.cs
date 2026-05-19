@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System;
 using System.Reactive.Subjects;
 using Binance.Client.Websocket.Communicator;
 using Binance.Client.Websocket.Json;
@@ -20,17 +21,17 @@ namespace Binance.Client.Websocket.Responses.Books
             if (stream == null)
                 return false;
 
-            if (!stream.Contains("depth"))
+            if (stream.IndexOf("depth", StringComparison.Ordinal) < 0)
                 return false;
 
-            if (stream.EndsWith("depth"))
+            if (stream.EndsWith("depth", StringComparison.Ordinal))
             {
                 // ignore, not partial, but diff response
                 return false;
             }
 
             var parsed = response.ToObject<OrderBookPartialResponse>(BinanceJsonSerializer.Serializer);
-            parsed.Data.Symbol = stream.Split('@').FirstOrDefault();
+            parsed.Data.Symbol = GetSymbol(stream);
             subject.OnNext(parsed);
 
             return true;
@@ -41,7 +42,7 @@ namespace Binance.Client.Websocket.Responses.Books
         /// </summary>
         public static void StreamFakeSnapshot(OrderBookPartial snapshot, IBinanceCommunicator communicator)
         {
-            var symbolSafe = (snapshot?.Symbol ?? string.Empty).ToLower();
+            var symbolSafe = (snapshot?.Symbol ?? string.Empty).ToLowerInvariant();
             var countSafe = snapshot?.Bids?.Length ?? 0;
             var response = new OrderBookPartialResponse();
             response.Data = snapshot;
@@ -49,6 +50,12 @@ namespace Binance.Client.Websocket.Responses.Books
 
             var serialized = JsonConvert.SerializeObject(response, BinanceJsonSerializer.Settings);
             communicator.StreamFakeMessage(ResponseMessage.TextMessage(serialized));
+        }
+
+        private static string GetSymbol(string stream)
+        {
+            var separator = stream.IndexOf('@');
+            return separator >= 0 ? stream.Substring(0, separator) : stream;
         }
     }
 }
